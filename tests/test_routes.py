@@ -5,38 +5,64 @@ Test cases can be run with the following:
   nosetests -v --with-spec --spec-color
   coverage report -m
 """
+from mimetypes import init
+from msilib import init_database
 import os
 import logging
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from service import app
-from service.models import db
+from service.models import db, init_db, Product
 from service.common import status  # HTTP Status Codes
+from tests.factoires import ProductFactory
+
+DATABASE_URI = os.getenv(
+    "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb")
+BASE_URL = "/products"
 
 
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
-class TestYourResourceServer(TestCase):
-    """ REST API Server Tests """
+class TestYourProductService(TestCase):
+    """ Product Server Tests """
 
     @classmethod
     def setUpClass(cls):
         """ This runs once before the entire test suite """
-        pass
+        app.config["TESTING"] = True
+        app.config["DEBUG"] = False
+        # Set up the test database
+        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+        app.logger.setLevel(logging.CRITICAL)
+        init_db(app)
 
     @classmethod
     def tearDownClass(cls):
         """ This runs once after the entire test suite """
-        pass
+        db.session.close()
 
     def setUp(self):
         """ This runs before each test """
         self.app = app.test_client()
+        db.session.query(Product).delete()
+        db.session.commit()
 
     def tearDown(self):
         """ This runs after each test """
-        pass
+        db.session.remote()
+
+    def _create_products(self, count):
+        products = []
+        for _ in range(count):
+            test_product = ProductFactory()
+            response = self.app.post(BASE_URL, json=test_product.serialize())
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED,
+                             "Could not create test product")
+            new_product = response.get_json()
+            test_product.id = new_product["id"]
+            products.append(test_product)
+        return products
 
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
@@ -46,3 +72,13 @@ class TestYourResourceServer(TestCase):
         """ It should call the home page """
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["name"], "Product REST API Service")
+
+    def test_health(self):
+        """It should be health"""
+        response = self.app.get("/healthcheck")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["status"], 200)
+        self.assertEqual(data["message"], "Healthy")
