@@ -43,7 +43,7 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256), nullable=False)
     description = db.Column(db.String(1024), nullable=False)
-    price = db.Column(db.Float, default=0.0)
+    price = db.Column(db.Integer, default=0)
 
 
     def __repr__(self):
@@ -90,18 +90,10 @@ class Product(db.Model):
         try:
             self.name = data["name"]
 
-            id=data.get("id","")
-            if isinstance(id,int) or (id and type(eval(price)==int)):
-                self.id=id
-            else:
-                raise DataValidationError(
-                "Invalid Product: invalid type for id - should be in integera " 
-                )
-
             self.description = data['description']
 
             price=data.get("price","")
-            if isinstance(price,float) or (price and type(eval(price)==float)):
+            if isinstance(price,int):
                 self.price=price
             else:
                 raise DataValidationError(
