@@ -1,12 +1,9 @@
 """
 Models for Product
-
 All of the models are stored in this module
-
 Models
 ------
 Product - the schema used in the product store
-
 Attributes:
 ----------
 id: integer - the id of the product (primary key)
@@ -85,7 +82,6 @@ class Product(db.Model):
     def deserialize(self, data):
         """
         Deserializes a Product from a dictionary
-
         Args:
             data (dict): A dictionary containing the resource data
         """
@@ -118,7 +114,6 @@ class Product(db.Model):
         """ Initializes the database session
         :param app: the Flask app
         :type data: Flask
-
         """
         logger.info("Initializing database")
         # This is where we initialize SQLAlchemy from the Flask app
@@ -135,10 +130,8 @@ class Product(db.Model):
     @classmethod
     def find(cls, product_id: int):
         """ Finds a Product by it's ID
-
         :param: product_id: the id of the Product to find
         :type: product_id: int
-
         :return: an instance with the product_id, or None if not found
         :rtype: Product
         """
@@ -159,11 +152,8 @@ class Product(db.Model):
     @classmethod
     def find_by_name(cls, name):
         """Returns all Products with the given name
-
-
         :param name: the name of the Products you want to match
         :type name: str
-
         :return: a collection of Products with that name
         :type: list
         """
