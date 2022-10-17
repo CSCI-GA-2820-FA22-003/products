@@ -9,9 +9,10 @@ Attributes:
 id: integer - the id of the product (primary key)
 name: string - the name of the product
 description: string - the description for the product
-price: float - the price of the product
+price: integer - the price of the product
 """
 import logging
+import string
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from datetime import date
@@ -150,7 +151,7 @@ class Product(db.Model):
         return cls.query.get_or_404(product_id)
 
     @classmethod
-    def find_by_name(cls, name):
+    def find_by_name(cls, name: str) -> list:
         """Returns all Products with the given name
         :param name: the name of the Products you want to match
         :type name: str
