@@ -42,7 +42,7 @@ class TestYourProductService(TestCase):
 
     def setUp(self):
         """ This runs before each test """
-        self.app = app.test_client()
+        self.client = app.test_client()
         db.session.query(Product).delete()
         db.session.commit()
 
@@ -68,15 +68,31 @@ class TestYourProductService(TestCase):
 
     def test_index(self):
         """ It should call the home page """
-        resp = self.app.get("/")
+        resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
         self.assertEqual(data["name"], "Product REST API Service")
 
     def test_health(self):
         """It should be health"""
-        response = self.app.get("/healthcheck")
+        response = self.client.get("/healthcheck")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(data["status"], 200)
         self.assertEqual(data["message"], "Healthy")
+
+    def test_update_product(self):
+        """It should Update an existing Product"""
+        # create a product to update
+        test_project = ProductFactory()
+        response = self.client.post(BASE_URL, json=test_project.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # update the product
+        new_project = response.get_json()
+        logging.debug(new_project)
+        new_project["name"] = "unknown_class"
+        response = self.client.put(f"{BASE_URL}/{new_project['id']}", json=new_project)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_product = response.get_json()
+        self.assertEqual(updated_product["name"], "unknown_class")

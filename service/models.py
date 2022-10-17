@@ -12,7 +12,7 @@ description: string - the description for the product
 price: integer - the price of the product
 """
 import logging
-import string
+import constant
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from datetime import date
@@ -30,7 +30,6 @@ def init_db(app):
 
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
-    pass
 
 
 class Product(db.Model):
@@ -42,9 +41,11 @@ class Product(db.Model):
 
     # Table Schema
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(256), nullable=False)
-    description = db.Column(db.String(1024), nullable=False)
-    price = db.Column(db.Integer, default=0)
+    name = db.Column(
+        db.String(constant.LENGTH_MAX_PRODUCT_NAME), nullable=False)
+    description = db.Column(
+        db.String(constant.LENGTH_MAX_PRODUCT_DESC), nullable=True)
+    price = db.Column(db.Integer, default=0, nullable=False)
 
     def __repr__(self):
         return "<Product %r id=[%s]>" % (self.name, self.id)
@@ -63,6 +64,8 @@ class Product(db.Model):
         Updates a Product to the database
         """
         logger.info("Saving %s", self.name)
+        if not self.id:
+            raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
     def delete(self):
@@ -80,7 +83,7 @@ class Product(db.Model):
             "price": self.price,
         }
 
-    def deserialize(self, data):
+    def deserialize(self, data: dict):
         """
         Deserializes a Product from a dictionary
         Args:
@@ -88,31 +91,39 @@ class Product(db.Model):
         """
         try:
             self.name = data["name"]
-
-            self.description = data['description']
-
-            price = data.get("price", "")
-            if isinstance(price, int):
-                self.price = price
+            if (len(self.name) > constant.LENGTH_MAX_PRODUCT_NAME):
+                raise DataValidationError(
+                    "Invalid Product: Too long name string: "
+                )
+            self.description = data.get('description', '')
+            if (len(self.description) > constant.LENGTH_MAX_PRODUCT_DESC):
+                raise DataValidationError(
+                    "Invalid Product: Too long description string: "
+                )
+            if isinstance(data['price'], float) or isinstance(data['price'], int):
+                self.price = data['price']
             else:
                 raise DataValidationError(
-                    "Invalid Product: invalid type for price - should be in float "
+                    "Invalid Product: invalid type for price: "
+                    + str(type(data['price'] + " instead of [int/float]"))
                 )
-
+        except AttributeError as error:
+            raise DataValidationError(
+                "Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
             raise DataValidationError(
-                "Invalid Product: missing " + error.args[0]
-            )
+                "Invalid product: missing " + error.args[0]) from error
         except TypeError as error:
             raise DataValidationError(
-                "Invalid Product: body of request contained bad or no data - "
-                "Error message: " + error
-            )
+                "Invalid product: body of request contained bad or no data. " +
+                "Error: " + str(error)
+            ) from error
         return self
 
     @classmethod
     def init_db(cls, app: Flask):
-        """ Initializes the database session
+        """ Initializes the database session 
+
         :param app: the Flask app
         :type data: Flask
         """

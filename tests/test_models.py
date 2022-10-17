@@ -5,6 +5,7 @@ from werkzeug.exceptions import NotFound
 from service.models import Product, DataValidationError, db
 from service import app
 from tests.factories import ProductFactory
+import constant
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
@@ -148,3 +149,66 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(product.name, products[1].name)
         self.assertEqual(product.description, products[1].description)
         self.assertEqual(product.price, products[1].price)
+
+    def test_serialize_a_product(self):
+        """It should serialize a Product"""
+        product = ProductFactory()
+        data = product.serialize()
+        self.assertNotEqual(data, None)
+        self.assertIn("id", data)
+        self.assertEqual(data["id"], product.id)
+        self.assertIn("name", data)
+        self.assertEqual(data["name"], product.name)
+        self.assertIn("description", data)
+        self.assertEqual(data["description"], product.description)
+        self.assertIn("price", data)
+        self.assertEqual(data["price"], product.price)
+
+    def test_deserialize_a_product(self):
+        """It should de-serialize a Project"""
+        data = ProductFactory().serialize()
+        product = Product()
+        product.deserialize(data)
+        self.assertNotEqual(product, None)
+        self.assertEqual(product.id, None)
+        self.assertEqual(product.name, data["name"])
+        self.assertEqual(product.description, data["description"])
+        self.assertEqual(product.price, data["price"])
+
+    def test_deserialize_missing_data(self):
+        """It should not deserialize a Product with missing data"""
+        data = {"id": 1, "name": "jewelry", "description": "diamond"}
+        product = Product()
+        self.assertRaises(DataValidationError, product.deserialize, data)
+
+    def test_deserialize_bad_data(self):
+        """It should not deserialize bad data"""
+        data = "this is not a dictionary"
+        product = Product()
+        self.assertRaises(DataValidationError, product.deserialize, data)
+        data = 1234
+        self.assertRaises(DataValidationError, product.deserialize, data)
+
+    def test_deserialize_bad_price(self):
+        """It should not deserialize a bad price attribute"""
+        test_product = ProductFactory()
+        data = test_product.serialize()
+        data["price"] = "12345"
+        product = Product()
+        self.assertRaises(DataValidationError, product.deserialize, data)
+
+    def test_deserialize_too_long_name(self):
+        """It should not deserialize a too long name attribute"""
+        test_product = ProductFactory()
+        data = test_product.serialize()
+        data["name"] = 's' * (constant.LENGTH_MAX_PRODUCT_NAME + 1)
+        product = Product()
+        self.assertRaises(DataValidationError, product.deserialize, data)
+
+    def test_deserialize_too_long_desc(self):
+        """It should not deserialize a too long desc attribute"""
+        test_product = ProductFactory()
+        data = test_product.serialize()
+        data["description"] = "s" * (constant.LENGTH_MAX_PRODUCT_DESC + 1)
+        product = Product()
+        self.assertRaises(DataValidationError, product.deserialize, data)
