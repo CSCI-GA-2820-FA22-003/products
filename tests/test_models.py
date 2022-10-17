@@ -47,7 +47,8 @@ class TestProductModel(unittest.TestCase):
 
     def test_create_a_product(self):
         """It should Create a product and assert that it exists"""
-        product = Product(id = 85265765, name="airPods", description="headphone developed by Apple", price=149)
+        product = Product(id=85265765, name="airPods",
+                          description="headphone developed by Apple", price=149)
         self.assertEqual(str(product), "<Product 'airPods' id=[85265765]>")
         self.assertTrue(product is not None)
         self.assertEqual(product.id, 85265765)
@@ -55,12 +56,12 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(product.description, "headphone developed by Apple")
         self.assertEqual(product.price, 149)
 
-
     def test_add_a_product(self):
         """It should Create a product and add it to the database"""
         products = Product.all()
         self.assertEqual(products, [])
-        product = Product(id = 85265765, name="airPods", description="headphone developed by Apple", price=149)
+        product = Product(id=85265765, name="airPods",
+                          description="headphone developed by Apple", price=149)
         self.assertTrue(product is not None)
         self.assertEqual(product.id, 85265765)
         product.create()
@@ -122,7 +123,7 @@ class TestProductModel(unittest.TestCase):
         # See if we get back 5 products
         products = product.all()
         self.assertEqual(len(products), 5)
-        
+
     def test_find_by_name(self):
         """It should Find a Product by Name"""
         products = ProductFactory.create_batch(5)
