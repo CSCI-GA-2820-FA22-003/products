@@ -1,0 +1,6 @@
+"""
+Global Constants
+"""
+
+LENGTH_MAX_PRODUCT_NAME = 256
+LENGTH_MAX_PRODUCT_DESC = 1024
