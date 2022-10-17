@@ -22,7 +22,7 @@ from factory.fuzzy import FuzzyChoice, FuzzyDate
 from service.models import Product
 
 
-class PetFactory(factory.Factory):
+class ProductFactory(factory.Factory):
     """Creates fake pets that you don't have to feed"""
 
     class Meta:  # pylint: disable=too-few-public-methods

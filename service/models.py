@@ -24,13 +24,16 @@ logger = logging.getLogger("flask.app")
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
 
+
 def init_db(app):
     # Initialize the SQLAlchemy app
     Product.init_db(app)
 
+
 class DataValidationError(Exception):
     """ Used for an data validation errors when deserializing """
     pass
+
 
 class Product(db.Model):
     """
@@ -44,7 +47,6 @@ class Product(db.Model):
     name = db.Column(db.String(256), nullable=False)
     description = db.Column(db.String(1024), nullable=False)
     price = db.Column(db.Integer, default=0)
-
 
     def __repr__(self):
         return "<Product %r id=[%s]>" % (self.name, self.id)
@@ -74,11 +76,11 @@ class Product(db.Model):
     def serialize(self):
         """ Serializes a Product into a dictionary """
         return {
-            "id": self.id, 
+            "id": self.id,
             "name": self.name,
             "description": self.description,
             "price": self.price,
-            }
+        }
 
     def deserialize(self, data):
         """
@@ -92,12 +94,12 @@ class Product(db.Model):
 
             self.description = data['description']
 
-            price=data.get("price","")
-            if isinstance(price,int):
-                self.price=price
+            price = data.get("price", "")
+            if isinstance(price, int):
+                self.price = price
             else:
                 raise DataValidationError(
-                "Invalid Product: invalid type for price - should be in float " 
+                    "Invalid Product: invalid type for price - should be in float "
                 )
 
         except KeyError as error:
@@ -113,8 +115,7 @@ class Product(db.Model):
 
     @classmethod
     def init_db(cls, app: Flask):
-        """ Initializes the database session 
-        
+        """ Initializes the database session
         :param app: the Flask app
         :type data: Flask
 
@@ -132,9 +133,9 @@ class Product(db.Model):
         return cls.query.all()
 
     @classmethod
-    def find(cls, product_id:int):
-        """ Finds a Product by it's ID 
-        
+    def find(cls, product_id: int):
+        """ Finds a Product by it's ID
+
         :param: product_id: the id of the Product to find
         :type: product_id: int
 
@@ -143,7 +144,7 @@ class Product(db.Model):
         """
         logger.info("Processing lookup for id %s ...", product_id)
         return cls.query.get(product_id)
- 
+
     @classmethod
     def find_or_404(cls, product_id: int):
         """Find a Product by it's id
@@ -159,7 +160,7 @@ class Product(db.Model):
     def find_by_name(cls, name):
         """Returns all Products with the given name
 
-       
+
         :param name: the name of the Products you want to match
         :type name: str
 

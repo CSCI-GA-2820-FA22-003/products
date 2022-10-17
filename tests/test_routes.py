@@ -5,8 +5,6 @@ Test cases can be run with the following:
   nosetests -v --with-spec --spec-color
   coverage report -m
 """
-from mimetypes import init
-from msilib import init_database
 import os
 import logging
 from unittest import TestCase
@@ -14,7 +12,7 @@ from unittest.mock import MagicMock, patch
 from service import app
 from service.models import db, init_db, Product
 from service.common import status  # HTTP Status Codes
-from tests.factoires import ProductFactory
+from tests.factories import ProductFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb")
@@ -50,7 +48,7 @@ class TestYourProductService(TestCase):
 
     def tearDown(self):
         """ This runs after each test """
-        db.session.remote()
+        db.session.remove()
 
     def _create_products(self, count):
         products = []
