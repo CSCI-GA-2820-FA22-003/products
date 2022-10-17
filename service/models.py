@@ -1,5 +1,5 @@
 """
-Models for YourResourceModel
+Models for Product
 
 All of the models are stored in this module
 
@@ -34,7 +34,7 @@ class DataValidationError(Exception):
 
 class Product(db.Model):
     """
-    Class that represents a YourResourceModel
+    Class that represents a Product
     """
 
     app = None
@@ -157,7 +157,7 @@ class Product(db.Model):
 
     @classmethod
     def find_by_name(cls, name):
-        """Returns all YourResourceModels with the given name
+        """Returns all Products with the given name
 
        
         :param name: the name of the Products you want to match
