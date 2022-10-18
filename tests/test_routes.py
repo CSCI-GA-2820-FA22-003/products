@@ -150,6 +150,45 @@ class TestProductServer(TestCase):
         updated_product = response.get_json()
         self.assertEqual(updated_product["name"], "unknown_class")
 
+    def test_list_product(self):
+        """It should return 200 status code"""
+        resp = self.client.get(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+    def test_read_product_success(self):
+        """It should Get an existing Product"""
+        product = ProductFactory()
+        product.create()
+        url = "{}/{}".format(BASE_URL, product.id)
+
+        resp = self.client.get(url)
+        data = resp.get_json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(data["name"], product.name)
+
+    def test_delete_product(self):
+        """It should Delete an existing Product"""
+        test_product = self._create_products(1)[0]
+        response = self.client.delete(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+        # make sure they are deleted
+        response = self.client.get(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+     ######################################################################
+    #  T E S T   S A D   P A T H S
+    ######################################################################
+
+    def test_read_product_not_found(self):
+        """It should not Get a Product with bad id"""
+        product = ProductFactory()
+        url = "{}/999".format(BASE_URL)
+
+        resp = self.client.get(url)
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_update_product_non_existing(self):
         """It should not update an non-existing Product"""
         # make sure product not exist
@@ -161,20 +200,6 @@ class TestProductServer(TestCase):
         response = self.client.put(
             f"{BASE_URL}/{test_product.id}", json=test_product.serialize())
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_delete_product(self):
-        """It should Delete an existing Product"""
-        test_product = self._create_products(1)[0]
-        response = self.client.delete(f"{BASE_URL}/{test_product.id}")
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(len(response.data), 0)
-        # make sure they are deleted
-        response = self.client.get(f"{BASE_URL}/{test_product.id}")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-     ######################################################################
-    #  T E S T   S A D   P A T H S
-    ######################################################################
 
     def test_create_product_no_data(self):
         """It should not Create a Product with missing data"""
