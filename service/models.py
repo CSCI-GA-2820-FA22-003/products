@@ -122,7 +122,7 @@ class Product(db.Model):
 
     @classmethod
     def init_db(cls, app: Flask):
-        """ Initializes the database session 
+        """ Initializes the database session
 
         :param app: the Flask app
         :type data: Flask
