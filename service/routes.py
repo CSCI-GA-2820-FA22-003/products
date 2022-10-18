@@ -59,6 +59,8 @@ def list_products():
 ######################################################################
 # RETRIEVE A Product
 ######################################################################
+
+
 @app.route("/products/<int:product_id>", methods=["GET"])
 def get_products(product_id):
     """
@@ -68,7 +70,8 @@ def get_products(product_id):
     app.logger.info("Request for product with id: %s", product_id)
     product = Product.find(product_id)
     if not product:
-        abort(status.HTTP_404_NOT_FOUND, f"Product with id '{product_id}' was not found.")
+        abort(status.HTTP_404_NOT_FOUND,
+              f"Product with id '{product_id}' was not found.")
 
     app.logger.info("Returning product: %s", product.name)
     return jsonify(product.serialize()), status.HTTP_200_OK
@@ -76,6 +79,8 @@ def get_products(product_id):
 ######################################################################
 # ADD A NEW Product
 ######################################################################
+
+
 @app.route("/products", methods=["POST"])
 def create_products():
     """
@@ -88,7 +93,8 @@ def create_products():
     product.deserialize(request.get_json())
     product.create()
     message = product.serialize()
-    location_url = url_for("get_products", product_id=product.id, _external=True)
+    location_url = url_for(
+        "get_products", product_id=product.id, _external=True)
 
     app.logger.info("Product with ID [%s] created.", product.id)
     return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
@@ -96,6 +102,7 @@ def create_products():
 # ######################################################################
 # # UPDATE AN EXISTING Product
 # ######################################################################
+
 
 @app.route("/products/<int:product_id>", methods=["PUT"])
 def update_product(product_id):
