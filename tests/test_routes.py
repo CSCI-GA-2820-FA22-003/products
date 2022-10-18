@@ -18,11 +18,10 @@ DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb")
 BASE_URL = "/products"
 
-
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
-class TestYourProductService(TestCase):
+class TestProductServer(TestCase):
     """ Product Server Tests """
 
     @classmethod
@@ -41,9 +40,9 @@ class TestYourProductService(TestCase):
         db.session.close()
 
     def setUp(self):
-        """ This runs before each test """
+        """Runs before each test"""
         self.client = app.test_client()
-        db.session.query(Product).delete()
+        db.session.query(Product).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
@@ -54,7 +53,7 @@ class TestYourProductService(TestCase):
         products = []
         for _ in range(count):
             test_product = ProductFactory()
-            response = self.app.post(BASE_URL, json=test_product.serialize())
+            response = self.client.post(BASE_URL, json=test_product.serialize())
             self.assertEqual(response.status_code, status.HTTP_201_CREATED,
                              "Could not create test product")
             new_product = response.get_json()
@@ -62,9 +61,33 @@ class TestYourProductService(TestCase):
             products.append(test_product)
         return products
 
-    ######################################################################
-    #  P L A C E   T E S T   C A S E S   H E R E
-    ######################################################################
+    # ######################################################################
+    # #  P L A C E   T E S T   C A S E S   H E R E
+    # ######################################################################
+    def test_create_product(self):
+        """It should Create a new Product"""
+        test_product = ProductFactory()
+        logging.debug("Test Product: %s", test_product.serialize())
+        response = self.client.post(BASE_URL, json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Make sure location header is set
+        location = response.headers.get("Location", None)
+        self.assertIsNotNone(location)
+
+        # Check the data is correct
+        new_product = response.get_json()
+        self.assertEqual(new_product["name"], test_product.name)
+        self.assertEqual(new_product["description"], test_product.description)
+        self.assertEqual(new_product["price"], test_product.price)
+
+        # Check that the location header was correct
+        response = self.client.get(location)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        new_product = response.get_json()
+        self.assertEqual(new_product["name"], test_product.name)
+        self.assertEqual(new_product["description"], test_product.description)
+        self.assertEqual(new_product["price"], test_product.price)
 
     def test_index(self):
         """ It should call the home page """
@@ -81,18 +104,41 @@ class TestYourProductService(TestCase):
         self.assertEqual(data["status"], 200)
         self.assertEqual(data["message"], "Healthy")
 
-    def test_update_product(self):
-        """It should Update an existing Product"""
-        # create a product to update
-        test_project = ProductFactory()
-        response = self.client.post(BASE_URL, json=test_project.serialize())
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    # def test_update_product(self):
+    #     """It should Update an existing Product"""
+    #     # create a product to update
+    #     test_project = ProductFactory()
+    #     response = self.client.post(BASE_URL, json=test_project.serialize())
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        # update the product
-        new_project = response.get_json()
-        logging.debug(new_project)
-        new_project["name"] = "unknown_class"
-        response = self.client.put(f"{BASE_URL}/{new_project['id']}", json=new_project)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        updated_product = response.get_json()
-        self.assertEqual(updated_product["name"], "unknown_class")
+    #     # update the product
+    #     new_project = response.get_json()
+    #     logging.debug(new_project)
+    #     new_project["name"] = "unknown_class"
+    #     response = self.client.put(f"{BASE_URL}/{new_project['id']}", json=new_project)
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     updated_product = response.get_json()
+    #     self.assertEqual(updated_product["name"], "unknown_class")
+
+     ######################################################################
+    #  T E S T   S A D   P A T H S
+    ######################################################################
+
+    def test_create_product_no_data(self):
+        """It should not Create a Product with missing data"""
+        response = self.client.post(BASE_URL, json={})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_product_no_content_type(self):
+        """It should not Create a Product with no content type"""
+        response = self.client.post(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_create_product_bad_price(self):
+        """It should not Create a Product with bad price data"""
+        test_product = ProductFactory()
+        logging.debug(test_product)
+        # change price to a string
+        test_product.price = "price"
+        response = self.client.post(BASE_URL, json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
