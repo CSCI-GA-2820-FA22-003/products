@@ -152,9 +152,7 @@ class TestProductServer(TestCase):
     def test_delete_product(self):
         """It should Delete an existing Product"""
         test_product = self._create_products(1)[0]
-        print("******1" + test_product)
         response = self.client.delete(f"{BASE_URL}/{test_product.id}")
-        print("******2" + response)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(len(response.data), 0)
         # make sure they are deleted
