@@ -38,34 +38,23 @@ def healthcheck():
 
 
 ######################################################################
-#  U T I L I T Y   F U N C T I O N S
+# LIST ALL PRODUCTS
 ######################################################################
 
+@app.route("/products", methods=["GET"])
+def list_products():
+    """"Return all of the Products"""
+    app.logger.info("Request for product list")
+    products = []
+    name = request.args.get("name")
+    if name:
+        products = Product.find_by_name(name)
+    else:
+        products = Product.all()
 
-def init_db():
-    """ Initializes the SQLAlchemy app """
-    global app
-    Product.init_db(app)
-
-
-def check_content_type(content_type):
-    """Checks that the media type is correct"""
-    if "Content-Type" not in request.headers:
-        app.logger.error("No Content-Type specified.")
-        abort(
-            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            f"Content-Type must be {content_type}",
-        )
-
-    if request.headers["Content-Type"] == content_type:
-        return
-
-    app.logger.error("Invalid Content-Type: %s",
-                     request.headers["Content-Type"])
-    abort(
-        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        f"Content-Type must be {content_type}",
-    )
+    results = [product.serialize() for product in products]
+    app.logger.info("Returning %d pets", len(results))
+    return jsonify(results), status.HTTP_200_OK
 
 ######################################################################
 # RETRIEVE A Product
@@ -129,3 +118,33 @@ def update_product(product_id):
 
     app.logger.info("Product with ID [%s] updated.", product.id)
     return jsonify(product.serialize()), status.HTTP_200_OK
+
+######################################################################
+#  U T I L I T Y   F U N C T I O N S
+######################################################################
+
+
+def init_db():
+    """ Initializes the SQLAlchemy app """
+    global app
+    Product.init_db(app)
+
+
+def check_content_type(content_type):
+    """Checks that the media type is correct"""
+    if "Content-Type" not in request.headers:
+        app.logger.error("No Content-Type specified.")
+        abort(
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            f"Content-Type must be {content_type}",
+        )
+
+    if request.headers["Content-Type"] == content_type:
+        return
+
+    app.logger.error("Invalid Content-Type: %s",
+                     request.headers["Content-Type"])
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        f"Content-Type must be {content_type}",
+    )
