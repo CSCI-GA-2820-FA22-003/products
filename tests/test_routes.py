@@ -104,21 +104,21 @@ class TestProductServer(TestCase):
         self.assertEqual(data["status"], 200)
         self.assertEqual(data["message"], "Healthy")
 
-    # def test_update_product(self):
-    #     """It should Update an existing Product"""
-    #     # create a product to update
-    #     test_project = ProductFactory()
-    #     response = self.client.post(BASE_URL, json=test_project.serialize())
-    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    def test_update_product(self):
+        """It should Update an existing Product"""
+        # create a product to update
+        test_project = ProductFactory()
+        response = self.client.post(BASE_URL, json=test_project.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    #     # update the product
-    #     new_project = response.get_json()
-    #     logging.debug(new_project)
-    #     new_project["name"] = "unknown_class"
-    #     response = self.client.put(f"{BASE_URL}/{new_project['id']}", json=new_project)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     updated_product = response.get_json()
-    #     self.assertEqual(updated_product["name"], "unknown_class")
+        # update the product
+        new_project = response.get_json()
+        logging.debug(new_project)
+        new_project["name"] = "unknown_class"
+        response = self.client.put(f"{BASE_URL}/{new_project['id']}", json=new_project)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_product = response.get_json()
+        self.assertEqual(updated_product["name"], "unknown_class")
 
      ######################################################################
     #  T E S T   S A D   P A T H S
