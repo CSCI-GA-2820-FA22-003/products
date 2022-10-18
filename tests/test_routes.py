@@ -57,8 +57,7 @@ class TestProductServer(TestCase):
         products = []
         for _ in range(count):
             test_product = ProductFactory()
-            response = self.client.post(
-                BASE_URL, json=test_product.serialize())
+            response = self.client.post(BASE_URL, json=test_product.serialize())
             self.assertEqual(response.status_code, status.HTTP_201_CREATED,
                              "Could not create test product")
             new_product = response.get_json()
@@ -149,6 +148,16 @@ class TestProductServer(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_product = response.get_json()
         self.assertEqual(updated_product["name"], "unknown_class")
+        
+    def test_delete_product(self):
+        """It should Delete an existing Product"""
+        test_product = self._create_products(1)[0]
+        response = self.client.delete(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+        # make sure they are deleted
+        response = self.client.get(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
      ######################################################################
     #  T E S T   S A D   P A T H S

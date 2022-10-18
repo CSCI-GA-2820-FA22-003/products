@@ -126,6 +126,19 @@ def update_product(product_id):
     app.logger.info("Product with ID [%s] updated.", product.id)
     return jsonify(product.serialize()), status.HTTP_200_OK
 
+@app.route("/products/<int:product_id>", methods=["DELETE"])
+def delete_product(product_id):
+    """
+    Delete a Product
+    This endpoint will delete a Product based the body that is posted
+    """
+    app.logger.info("Request to delete Product with id: %s", product_id)
+    product = Product.find(product_id)
+    if product:
+        product.delete()
+
+    app.logger.info("Product with ID [%s] delete complete.", product_id)
+    return "", status.HTTP_204_NO_CONTENT
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
