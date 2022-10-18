@@ -104,6 +104,16 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(products[0].id, original_id)
         self.assertEqual(products[0].name, "airPods2")
 
+    def test_update_a_product_without_id(self):
+        """It should not update a Product without id"""
+        product = ProductFactory()
+        logging.debug(product)
+        product.create()
+        product.id = None
+        self.assertIsNone(product.id)
+        # save it
+        self.assertRaises(DataValidationError, product.update)
+
     def test_delete_a_product(self):
         """It should Delete a Products"""
         product = ProductFactory()

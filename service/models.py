@@ -107,9 +107,6 @@ class Product(db.Model):
                     "Invalid Product: invalid type for price: "
                     + str(type(data['price'] + " instead of [int/float]"))
                 )
-        except AttributeError as error:
-            raise DataValidationError(
-                "Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
             raise DataValidationError(
                 "Invalid product: missing " + error.args[0]) from error
