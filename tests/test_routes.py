@@ -150,17 +150,17 @@ class TestProductServer(TestCase):
         updated_product = response.get_json()
         self.assertEqual(updated_product["name"], "unknown_class")
 
-    def test_update_product_non_existing(self):
-        """It should not update an non-existing Product"""
-        # make sure product not exist
-        test_product = ProductFactory()
-        test_product.id = 4567486
-        response = self.client.delete(f"{BASE_URL}/{test_product.id}")
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        # update the product
-        response = self.client.put(
-            f"{BASE_URL}/{test_product.id}", json=test_product.serialize())
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    def test_read_product_success(self):
+        """It should Get an existing Product"""
+        product = ProductFactory()
+        product.create()
+        url = "{}/{}".format(BASE_URL, product.id)
+
+        resp = self.client.get(url)
+        data = resp.get_json()
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(data["name"], product.name)
 
     def test_delete_product(self):
         """It should Delete an existing Product"""
@@ -175,6 +175,12 @@ class TestProductServer(TestCase):
      ######################################################################
     #  T E S T   S A D   P A T H S
     ######################################################################
+
+    def test_read_product_not_found(self):
+        """It should not Get a Product with bad id"""
+        resp = self.client.get("{}/999".format(BASE_URL))
+
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_create_product_no_data(self):
         """It should not Create a Product with missing data"""
@@ -204,6 +210,19 @@ class TestProductServer(TestCase):
 
     def test_update_product_wrong_content_type(self):
         """It should not update a product with wrong content type"""
-        response = self.client.put(BASE_URL+"/1", content_type = '<p>hello boy</p>')
+        response = self.client.put(
+            BASE_URL+"/1", content_type='<p>hello boy</p>')
         self.assertEqual(response.status_code,
                          status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    def test_update_product_non_existing(self):
+        """It should not update an non-existing Product"""
+        # make sure product not exist
+        test_product = ProductFactory()
+        test_product.id = 4567486
+        response = self.client.delete(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        # update the product
+        response = self.client.put(
+            f"{BASE_URL}/{test_product.id}", json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
