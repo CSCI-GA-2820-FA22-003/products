@@ -36,7 +36,17 @@ Products schema
 ## List of REST API endpoints
 
 ```
+POST   /shopcarts		 <- Create a shopcart
+GET    /shopcarts	     <- List all shopcarts
+GET    /shopcarts/{id}	 <- Read a shopcart 
+PUT    /shopcarts/{id}	 <- Update a shopcart
+DELETE /shopcarts/{id}	 <- Delete a shopcart
 
+POST   /shopcarts/{id}/items	   <- Add an item to a shopcart
+GET    /shopcarts/{id}/items	   <- List all items in a shopcart
+GET    /shopcarts/{id}/items/{id}  <- Read an item from a shopcart
+PUT    /shopcarts/{id}/items/{id}  <- Update an item in a shopcart
+DELETE /shopcarts/{id}/items/{id}  <- Delete an item from a shopcart
 ```
 
 ## Create a product
