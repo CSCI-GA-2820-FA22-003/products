@@ -52,12 +52,10 @@ POST /shopcarts/<user_id>/items
 
 ```
 {
-    "user_id": "1",
-    "product_id": "2",
-    "name": "haha",
-    "quantity": 12,
-    "price": 1,
-    "time": "2020-12-12"
+    "id": 85265765, 
+    "name": "airPods",
+    "description": "headphone developed by Apple", 
+    "price": 149
 }
 ```
 
@@ -68,13 +66,10 @@ POST /shopcarts/<user_id>/items
         **Content**:
     ```
     {
-    "id": 1,
-    "name": "haha",
-    "price": 1.0,
-    "product_id": "2",
-    "quantity": 12.0,
-    "time": "2020-12-12",
-    "user_id": "1"
+    "id": 85265765, 
+    "name": "airPods",
+    "description": "headphone developed by Apple", 
+    "price": 149
     }
     ```
 - **Error Response**: 
@@ -83,7 +78,7 @@ POST /shopcarts/<user_id>/items
         ```
         {
          "error": "Conflict",
-         "message": "409 Conflict: Shopcart 1 already exists",
+         "message": "409 Conflict: Product airPods already exists",
          "status": 409
         }
         ```
@@ -102,12 +97,10 @@ PUT /shopcarts/<user_id>
 
 ```
 {
-    "user_id": "1",
-    "product_id": "2",
-    "name": "xixi",
-    "quantity": 131,
-    "price": 2,
-    "time": "2020-12-13"
+    "id": 85265765, 
+    "name": "airPods",
+    "description": "headphone developed by Apple", 
+    "price": 149
 }
 ```
 
@@ -117,13 +110,10 @@ PUT /shopcarts/<user_id>
         **Content**:
         ```
         {
-           "id": 2,
-           "name": "xixi",
-           "price": 2.0,
-           "product_id": "2",
-           "quantity": 131.0,
-           "time": "2020-12-13",
-           "user_id": "1"
+         "id": 85265765, 
+         "name": "airPods",
+         "description": "headphone developed by Apple", 
+         "price": 149
         }
         ```
         
@@ -134,7 +124,7 @@ PUT /shopcarts/<user_id>
         ```
         {
          "error": "Not Found",
-         "message": "404 Not Found: Product with id 21 was not found in shopcart 1.",
+         "message": "404 Not Found: Product with id 21 was not found.",
          "status": 404
         }
         ```
@@ -158,13 +148,10 @@ GET /shopcarts/<user_id>/items/<product_id>
         Content:
         ```
         {
-            "id": 2,
-            "name": "xixi",
-            "price": 2.0,
-            "product_id": "2",
-            "quantity": 13.0,
-            "time": "2020-12-13",
-            "user_id": "1"
+             "id": 85265765, 
+             "name": "airPods",
+             "description": "headphone developed by Apple", 
+             "price": 149
         }
         ```
 - **Error Response**:
@@ -202,22 +189,16 @@ GET /shopcarts/<user_id>/items
        ```
         [
         {
-        "id": 2,
-        "name": "xixi",
-        "price": 2.0,
-        "product_id": "2",
-        "quantity": 13.0,
-        "time": "2020-12-13",
-        "user_id": "1"
+           "id": 85265765, 
+           "name": "airPods",
+           "description": "headphone developed by Apple", 
+           "price": 149
          },
         {
-        "id": 3,
-        "name": "haha",
-        "price": 1.0,
-        "product_id": "3",
-        "quantity": 12.0,
-        "time": "2020-12-12",
-        "user_id": "1"
+           "id": 85265765, 
+           "name": "airPods",
+           "description": "headphone developed by Apple", 
+           "price": 149
         }
         ]
         ```
@@ -229,7 +210,7 @@ GET /shopcarts/<user_id>/items
         ```
         {
          "error": "Not Found",
-         "message": "404 Not Found: Shopcart with id '11' was not found.",
+         "message": "404 Not Found: Product with id '11' was not found.",
          "status": 404
         }
         ```
@@ -248,12 +229,10 @@ PUT /shopcarts/<user_id>
 
 ```
 {
-    "user_id": "1",
-    "product_id": "2",
-    "name": "xixi",
-    "quantity": 131,
-    "price": 2,
-    "time": "2020-12-13"
+    "id": 85265765, 
+    "name": "airPods",
+    "description": "headphone developed by Apple", 
+    "price": 149
 }
 ```
 
@@ -263,13 +242,10 @@ PUT /shopcarts/<user_id>
         Content:
         ```
         {
-         "id": 2,
-         "name": "xixi",
-         "price": 2.0,
-         "product_id": "2",
-         "quantity": 131.0,
-         "time": "2020-12-13",
-         "user_id": "1"
+            "id": 85265765, 
+            "name": "airPods",
+            "description": "headphone developed by Apple", 
+            "price": 149
         }
         ```
 - **Error Response**:
@@ -310,71 +286,3 @@ DELETE /shopcarts/<user_id>/items/<product_id>
             "status": 404
         }
         ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## Manual Setup
-
-You can also clone this repository and then copy and paste the starter code into your project repo folder on your local computer. Be careful not to copy over your own `README.md` file so be selective in what you copy.
-
-There are 4 hidden files that you will need to copy manually if you use the Mac Finder or Windows Explorer to copy files from this folder into your repo folder.
-
-These should be copied using a bash shell as follows:
-
-```bash
-    cp .gitignore  ../<your_repo_folder>/
-    cp .flaskenv ../<your_repo_folder>/
-    cp .gitattributes ../<your_repo_folder>/
-```
-
-## Contents
-
-The project contains the following:
-
-```text
-.gitignore          - this will ignore vagrant and other metadata files
-.flaskenv           - Environment variables to configure Flask
-.gitattributes      - File to gix Windows CRLF issues
-.devcontainers/     - Folder with support for VSCode Remote Containers
-dot-env-example     - copy to .env to use environment variables
-requirements.txt    - list if Python libraries required by your code
-config.py           - configuration parameters
-
-service/                   - service python package
-├── __init__.py            - package initializer
-├── models.py              - module with business models
-├── routes.py              - module with service routes
-└── common                 - common code package
-    ├── error_handlers.py  - HTTP error handling code
-    ├── log_handlers.py    - logging setup code
-    └── status.py          - HTTP status constants
-
-tests/              - test cases package
-├── __init__.py     - package initializer
-├── test_models.py  - test suite for business models
-└── test_routes.py  - test suite for service routes
-```
-
-## License
-
-Copyright (c) John Rofrano. All rights reserved.
-
-Licensed under the Apache License. See [LICENSE](LICENSE)
-
-This repository is part of the NYU masters class: **CSCI-GA.2820-001 DevOps and Agile Methodologies** created and taught by *John Rofrano*, Adjunct Instructor, NYU Courant Institute, Graduate Division, Computer Science, and NYU Stern School of Business.
