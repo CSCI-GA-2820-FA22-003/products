@@ -1,3 +1,14 @@
+# This is the project for our products team
+
+## Important: Before you submit a pull request. Make sure
+- Run `nosetest` to make sure that all tests are passed and code coverage are no less than 95%
+- Run `make lint` to make sure that there is no Pylint error.
+
+
+## Reminder: Whenever you make changes to the table schema. Run `flask create-db` to sync the database
+
+## Run `flask run` to start the service. If you want to clean the database, run `flask create-db`.
+
 ## Product table schema
 ```
 {
