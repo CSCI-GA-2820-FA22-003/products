@@ -1,17 +1,333 @@
-# NYU DevOps Project Template
+# This is the project for our products team
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
+## Important: Before you submit a pull request. Make sure
+- Run `nosetest` to make sure that all tests are passed and code coverage are no less than 95%
+- Run `make lint` to make sure that there is no Pylint error.
 
-This is a skeleton you can use to start your projects
 
-## Overview
+## Reminder: Whenever you make changes to the table schema. Run `flask create-db` to sync the database
 
-This project template contains starter code for your class project. The `/service` folder contains your `models.py` file for your model and a `routes.py` file for your service. The `/tests` folder has test case starter code for testing the model and the service separately. All you need to do is add your functionality. You can use the [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd) for code examples to copy from.
+## Run `flask run` to start the service. If you want to clean the database, run `flask create-db`.
 
-## Automatic Setup
+Product table schema
 
-The best way to use this repo is to start your own repo using it as a git template. To do this just press the green **Use this template** button in GitHub and this will become the source for your repository.
+```
+{
+      id: auto_generated            Int           Primary key
+      user_id: user_id1             String        foreign key
+      product_id: product_id1       String        key
+      quantity: product_quantity1   Float
+      name: product_name1           String
+      price: price1                 Float
+      time: purchase_time1          Date
+}
+```
+
+Products table schema
+
+```
+Products schema
+{
+      id: auto_generated          Int          Primary key
+      user_id: user_id1           String       unique
+}
+```
+
+## List of REST API endpoints
+
+```
+
+```
+
+## Create a product
+Create a product by used_id and product detail
+
+- **URL**
+
+POST /shopcarts/<user_id>/items
+
+- **Request Headers**: Content-Type: application/json
+
+- **Body**:
+
+```
+{
+    "user_id": "1",
+    "product_id": "2",
+    "name": "haha",
+    "quantity": 12,
+    "price": 1,
+    "time": "2020-12-12"
+}
+```
+
+- **Success Response**:
+
+    - **Code**: HTTP_201_CREATED
+    
+        **Content**:
+    ```
+    {
+    "id": 1,
+    "name": "haha",
+    "price": 1.0,
+    "product_id": "2",
+    "quantity": 12.0,
+    "time": "2020-12-12",
+    "user_id": "1"
+    }
+    ```
+- **Error Response**: 
+    - **Code**: HTTP_409_CONFLICT
+        **Content**:
+        ```
+        {
+         "error": "Conflict",
+         "message": "409 Conflict: Shopcart 1 already exists",
+         "status": 409
+        }
+        ```
+
+## Update a product
+
+Update a product by user_id and product_id and product detail
+
+- **URL**
+
+PUT /shopcarts/<user_id>
+
+- **Request Headers**: Content-Type: application/json
+
+- **Body**:
+
+```
+{
+    "user_id": "1",
+    "product_id": "2",
+    "name": "xixi",
+    "quantity": 131,
+    "price": 2,
+    "time": "2020-12-13"
+}
+```
+
+- **Success Response**:
+
+    - **Code**: HTTP_200_OK
+        **Content**:
+        ```
+        {
+           "id": 2,
+           "name": "xixi",
+           "price": 2.0,
+           "product_id": "2",
+           "quantity": 131.0,
+           "time": "2020-12-13",
+           "user_id": "1"
+        }
+        ```
+        
+- **Error Response**:
+
+    - **Code**: HTTP_404_NOT_FOUND
+        **Content**:
+        ```
+        {
+         "error": "Not Found",
+         "message": "404 Not Found: Product with id 21 was not found in shopcart 1.",
+         "status": 404
+        }
+        ```
+        
+
+## Read a product
+Read a shopcart by user_id and product_id
+
+- **URL**
+
+GET /shopcarts/<user_id>/items/<product_id>
+
+- **Request Headers**: NULL
+
+- **Body**: NULL
+
+- **Success Response**:
+
+    - **Code**: HTTP_200_OK
+
+        Content:
+        ```
+        {
+            "id": 2,
+            "name": "xixi",
+            "price": 2.0,
+            "product_id": "2",
+            "quantity": 13.0,
+            "time": "2020-12-13",
+            "user_id": "1"
+        }
+        ```
+- **Error Response**:
+
+    - **Code**: HTTP_404_NOT_FOUND
+        
+        Content:
+        ```
+        {
+          "error": "Not Found",
+          "message": "404 Not Found: Product with id 1 was not found in shopcart 1.",
+          "status": 404
+        }
+        ```
+
+
+
+
+## Read all products
+Read all product in table
+
+- **URL**
+
+GET /shopcarts/<user_id>/items
+
+- **Request Headers**: NULL
+
+- **Body**: NULL
+
+- **Success Response**:
+
+    -**Code**: HTTP_200_OK
+        Content:
+
+       ```
+        [
+        {
+        "id": 2,
+        "name": "xixi",
+        "price": 2.0,
+        "product_id": "2",
+        "quantity": 13.0,
+        "time": "2020-12-13",
+        "user_id": "1"
+         },
+        {
+        "id": 3,
+        "name": "haha",
+        "price": 1.0,
+        "product_id": "3",
+        "quantity": 12.0,
+        "time": "2020-12-12",
+        "user_id": "1"
+        }
+        ]
+        ```
+
+- **Error Response**:
+
+    - **Code**: HTTP_404_NOT_FOUND
+        Content:
+        ```
+        {
+         "error": "Not Found",
+         "message": "404 Not Found: Shopcart with id '11' was not found.",
+         "status": 404
+        }
+        ```
+
+## Update a product
+
+Update a product by user_id and product_id and product detail
+
+- **URL**
+
+PUT /shopcarts/<user_id>
+
+- **Request Headers**: Content-Type: application/json
+
+- **Body**:
+
+```
+{
+    "user_id": "1",
+    "product_id": "2",
+    "name": "xixi",
+    "quantity": 131,
+    "price": 2,
+    "time": "2020-12-13"
+}
+```
+
+- **Success Response**:
+
+    - **Code**: HTTP_200_OK
+        Content:
+        ```
+        {
+         "id": 2,
+         "name": "xixi",
+         "price": 2.0,
+         "product_id": "2",
+         "quantity": 131.0,
+         "time": "2020-12-13",
+         "user_id": "1"
+        }
+        ```
+- **Error Response**:
+
+    - **Code**: HTTP_404_NOT_FOUND
+        Content:
+        ```
+        {
+         "error": "Not Found",
+         "message": "404 Not Found: Product with id 21 was not found in shopcart 1.",
+         "status": 404
+        }
+        ```
+
+## Delete a product
+Delete a product by user_id and product_id
+
+- **URL**
+
+DELETE /shopcarts/<user_id>/items/<product_id>
+
+- **Request Headers**: NULL
+
+- **Body**: NULL
+
+- **Success Response**:
+
+    - **Code**: HTTP_204_NO_CONTENT
+        Content: NO_CONTENT
+- **Error Response**:
+
+    - **Code**: HTTP_404_NOT_FOUND
+        Content:
+        ```
+        {
+            "error": "Not Found",
+            "message": "404 Not Found: Product with id 3 was not found in shopcart 2.",
+            "status": 404
+        }
+        ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Manual Setup
 
