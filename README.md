@@ -61,6 +61,7 @@ Content-Type: application/json
 
   ```json
   {
+    "name": "airPods"
     "price": "1.1",
     "description": "description"
   }
@@ -72,6 +73,7 @@ Content-Type: application/json
     **Content:** 
     ```json
     { 
+      "name": "airPods"
       "id" : 1, 
       "price" : 1.1, 
       "description": "description" 
@@ -116,6 +118,7 @@ Content-Type: application/json
     **Content:** 
     ```json
     {
+        "name": "airPods"
         "id": 1,
         "price": 2,
         "description": "description"
@@ -153,6 +156,7 @@ NULL
     **Content:** 
     ```json
     {
+        "name": "airPods"
         "id": 1,
         "price": 2,
         "description": "description"
@@ -178,6 +182,8 @@ NULL
 * **URL**
 
   GET /products
+  
+  GET /products/name
 
 * **Request Headers:**
 NULL
@@ -190,16 +196,22 @@ NULL
     ```json
     [
         {
+            "name": "airPods"
             "id": 1,
             "price": 2,
             "description": "description"
         },
         {
+            "name": "airPods2"
             "id": 2,
             "price": 2,
             "description": "description"
         }
     ]
+      {
+            "name": "airPods"
+            "name": "airPods2"
+        }
     ```
 
 * **Error Response:**
