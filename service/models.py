@@ -15,7 +15,6 @@ import logging
 import constant
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
-from datetime import date
 
 logger = logging.getLogger("flask.app")
 
