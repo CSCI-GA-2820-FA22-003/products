@@ -103,12 +103,12 @@ Content-Type: application/json
 
 * **Error Response:**
 
-  * **Code:** HTTP_409_CONFLICT <br />
+  * **Code:** HTTP_415_UNSUPPORTED_MEDIA_TYPE <br />
     **Content:** 
     ```json
     {
-      "error": "Conflict",
-      "message": "409 Conflict: Product 1 already exists",
+      "error": "Unsupported media type",
+      "message": "415 Unsupported Media Type: Content-Type must be application/json",
       "status": 409
     }
     ```
