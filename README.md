@@ -1,4 +1,25 @@
-# This is the project for our products team
+# NYU DevOps Fall 22 Project Products Team
+
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
+
+## Overview
+
+This project contains code for class project products microservice. The `/service` folder contains `models.py` file for database model and a `routes.py` file for REST API service. The `/tests` folder has a test cases file `test_model.py` for databse model, and `test_routes.py` for testing API routes.
+
+## Setup
+Using the following code to setup the repository on your machine:
+
+```
+git clone https://github.com/nyu-devops-fall22-products/products.git
+cd products
+code .
+```
+Then Visual Studio Code will be opened. Select `Reopen In Container` to open it in the preset Docker environment.
+
+To run tests for database models and routes, run the command: `nosetests -v --with-spec --spec-color`
+
+To launch the service, run the command: `make run`
 
 ## Contents
 
@@ -31,10 +52,10 @@ tests/              - test cases package
 ## Product table schema
 ```
 {
-      id: auto_generated            Int           Primary key
-      name: product_name1           String
-      description: description      String
-      price: 1.1                    Float
+      id: auto_generated              Int           Primary key
+      name: "product_name1"           String
+      description: "description"      String
+      price: 1.1                      Float
 }
 ```
 
@@ -106,10 +127,11 @@ Content-Type: application/json
 * **Body:**
 
   ```json
-  [{
+  {
       "price": 2,
-      "description": "description"
-  }]
+      "description": "description",
+      "name": "airPods"
+  }
   ```
  
 * **Success Response:**
