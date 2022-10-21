@@ -4,7 +4,7 @@ My Service
 Describe what your service does here
 """
 
-from flask import Flask, jsonify, request, url_for, make_response, abort
+from flask import jsonify, request, url_for, abort
 from .common import status  # HTTP Status Codes
 from service.models import Product
 
@@ -125,6 +125,7 @@ def update_product(product_id):
 
     app.logger.info("Product with ID [%s] updated.", product.id)
     return jsonify(product.serialize()), status.HTTP_200_OK
+
 
 @app.route("/products/<int:product_id>", methods=["DELETE"])
 def delete_product(product_id):
