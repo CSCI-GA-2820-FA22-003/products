@@ -183,7 +183,7 @@ NULL
 
   GET /products
   
-  GET /products/name
+  GET /products/?name=
 
 * **Request Headers:**
 NULL
@@ -208,11 +208,8 @@ NULL
             "description": "description"
         }
     ]
-      {
-            "name": "airPods"
-            "name": "airPods2"
-        }
     ```
+    
 
 * **Error Response:**
 NULL
