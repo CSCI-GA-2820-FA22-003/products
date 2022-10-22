@@ -1,31 +1,25 @@
-# NYU DevOps Project Template
+# NYU DevOps Fall 22 Project Products Team
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 
-This is a skeleton you can use to start your projects
-
 ## Overview
 
-This project template contains starter code for your class project. The `/service` folder contains your `models.py` file for your model and a `routes.py` file for your service. The `/tests` folder has test case starter code for testing the model and the service separately. All you need to do is add your functionality. You can use the [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd) for code examples to copy from.
+This project contains code for class project products microservice. The `/service` folder contains `models.py` file for database model and a `routes.py` file for REST API service. The `/tests` folder has a test cases file `test_model.py` for databse model, and `test_routes.py` for testing API routes.
 
-## Automatic Setup
+## Setup
+Using the following code to setup the repository on your machine:
 
-The best way to use this repo is to start your own repo using it as a git template. To do this just press the green **Use this template** button in GitHub and this will become the source for your repository.
-
-## Manual Setup
-
-You can also clone this repository and then copy and paste the starter code into your project repo folder on your local computer. Be careful not to copy over your own `README.md` file so be selective in what you copy.
-
-There are 4 hidden files that you will need to copy manually if you use the Mac Finder or Windows Explorer to copy files from this folder into your repo folder.
-
-These should be copied using a bash shell as follows:
-
-```bash
-    cp .gitignore  ../<your_repo_folder>/
-    cp .flaskenv ../<your_repo_folder>/
-    cp .gitattributes ../<your_repo_folder>/
 ```
+git clone https://github.com/nyu-devops-fall22-products/products.git
+cd products
+code .
+```
+Then Visual Studio Code will be opened. Select `Reopen In Container` to open it in the preset Docker environment.
+
+To run tests for database models and routes, run the command: `nosetests -v --with-spec --spec-color`
+
+To launch the service, run the command: `make run`
 
 ## Contents
 
@@ -54,6 +48,215 @@ tests/              - test cases package
 ├── test_models.py  - test suite for business models
 └── test_routes.py  - test suite for service routes
 ```
+
+## Product table schema
+```
+{
+      id: auto_generated              Int           Primary key
+      name: "product_name1"           String
+      description: "description"      String
+      price: 1.1                      Float
+}
+```
+
+**List of REST API endpoints**
+----
+```
+POST   /products <- Create a product
+GET    /products     <- List all products
+GET    /products/{id} <- Read a product 
+PUT    /products/{id} <- Update a product
+DELETE /products/{id} <- Delete a product
+```
+
+**Create a product**
+----
+
+* **URL**
+
+  POST /products
+
+* **Request Headers:**
+Content-Type: application/json
+* **Body:**
+
+  ```json
+  {
+    "name": "airPods"
+    "price": "1.1",
+    "description": "description"
+  }
+  ```
+ 
+* **Success Response:**
+
+  * **Code:** HTTP_201_CREATED <br />
+    **Content:** 
+    ```json
+    { 
+      "name": "airPods"
+      "id" : 1, 
+      "price" : 1.1, 
+      "description": "description" 
+    }
+    ```
+
+* **Error Response:**
+
+  * **Code:** HTTP_415_UNSUPPORTED_MEDIA_TYPE <br />
+    **Content:** 
+    ```json
+    {
+      "error": "Unsupported media type",
+      "message": "415 Unsupported Media Type: Content-Type must be application/json",
+      "status": 409
+    }
+    ```
+
+
+**Update a product**
+----
+  Update a product by id
+
+* **URL**
+
+  PUT /products/<product_id>
+
+* **Request Headers:**
+Content-Type: application/json
+* **Body:**
+
+  ```json
+  {
+      "price": 2,
+      "description": "description",
+      "name": "airPods"
+  }
+  ```
+ 
+* **Success Response:**
+
+  * **Code:** HTTP_201_CREATED <br />
+    **Content:** 
+    ```json
+    {
+        "name": "airPods"
+        "id": 1,
+        "price": 2,
+        "description": "description"
+    }
+    ```
+
+* **Error Response:**
+
+  * **Code:** HTTP_404_NOT_FOUND <br />
+    **Content:** 
+    ```json
+    {
+    "error": "NOT Found",
+    "message": "404 NOT FOUND: Product 1 not found",
+    "status": 404
+    }
+    ```
+
+**Read a product**
+----
+  Read a product by product_id
+
+* **URL**
+
+  GET /products/<user_id>
+
+* **Request Headers:**
+NULL
+* **Body:**
+NULL
+ 
+* **Success Response:**
+
+  * **Code:** HTTP_200_OK <br />
+    **Content:** 
+    ```json
+    {
+        "name": "airPods"
+        "id": 1,
+        "price": 2,
+        "description": "description"
+    }
+    ```
+
+* **Error Response:**
+
+  * **Code:** HTTP_404_NOT_FOUND <br />
+    **Content:** 
+    ```json
+    {
+    "error": "Not Found",
+    "message": "404 Not Found: Product with id '11' was not found.",
+    "status": 404
+    }
+    ```
+
+**Read all products**
+----
+  Read all products in table
+
+* **URL**
+
+  GET /products
+  
+  GET /products/?name=
+
+* **Request Headers:**
+NULL
+* **Body:**
+NULL
+ 
+* **Success Response:**
+* **Code:** HTTP_200_OK <br />
+    **Content:** 
+    ```json
+    [
+        {
+            "name": "airPods"
+            "id": 1,
+            "price": 2,
+            "description": "description"
+        },
+        {
+            "name": "airPods2"
+            "id": 2,
+            "price": 2,
+            "description": "description"
+        }
+    ]
+    ```
+    
+
+* **Error Response:**
+NULL
+
+**Delete a product**
+----
+  Delete a product by product_id
+
+* **URL**
+    
+    DELETE /products/<product_id>
+
+* **Request Headers:**
+NULL
+* **Body:**
+NULL
+ 
+* **Success Response:**
+
+  * **Code:** HTTP_204_NO_CONTENT <br />
+    **Content:** 
+    NO_CONTENT
+
+* **Error Response:**
+NULL
 
 ## License
 
