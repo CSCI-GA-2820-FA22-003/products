@@ -167,3 +167,26 @@ class Product(db.Model):
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
+
+    @classmethod
+    def find_by_attribute(cls, **kwargs) -> list:
+        """Returns all Products with the given name
+        :param name: the name of the Products you want to match
+        :type name: str
+        :return: a collection of Products with that name
+        :type: list
+        """
+        # cls.query.filter(cls.name == name)
+        # logger.info("Processing name query for %s ...", name)
+        logger.info("Processing name query for %s ...", kwargs.get("description", ""))
+        res = cls.query
+        if kwargs.get("id") is not None:
+            res = res.filter(Product.id == kwargs.get("id"))
+        if kwargs.get("name") is not None:
+            res = res.filter(Product.name == kwargs.get("name"))
+        if kwargs.get("description") is not None:
+            res = res.filter(Product.description == kwargs.get("description"))
+        if kwargs.get("price") is not None:
+            res = res.filter(Product.price == kwargs.get("price"))
+        # return cls.query.filter(Product.name == kwargs.get("name")).filter(Product.description == kwargs.get("description"))
+        return res

@@ -41,20 +41,51 @@ def healthcheck():
 # LIST ALL PRODUCTS
 ######################################################################
 
+# @app.route("/products", methods=["GET"])
+# def list_products():
+#     """"Return all of the Products"""
+#     app.logger.info("Request for product list")
+#     products = []
+#     name = request.args.get("name")
+#     if name:
+#         products = Product.find_by_name(name)
+#     else:
+#         products = Product.all()
+
+#     results = [product.serialize() for product in products]
+#     app.logger.info("Returning %d pets", len(results))
+#     return jsonify(results), status.HTTP_200_OK
+
+######################################################################
+# LIST PRODUCTS BY ATTRIBUTES
+######################################################################
+
 @app.route("/products", methods=["GET"])
-def list_products():
+def list_products_by_attributes():
     """"Return all of the Products"""
     app.logger.info("Request for product list")
+    args = request.args
+    product_id = request.args.get("id", None)
+    product_name = request.args.get("name", None)
+    product_description = request.args.get("description", None)
+    product_price = request.args.get("price", None)
+    # app.logger.info("%s %s %s %s", product_id, product_name, product_description, product_price)
     products = []
-    name = request.args.get("name")
-    if name:
-        products = Product.find_by_name(name)
-    else:
-        products = Product.all()
-
+    products = Product.find_by_attribute(id=product_id, name=product_name, description=product_description, price=product_price)
     results = [product.serialize() for product in products]
-    app.logger.info("Returning %d pets", len(results))
+    app.logger.info("Returning %d products by attribute", len(results))
     return jsonify(results), status.HTTP_200_OK
+    # app.logger.info("Request for product list")
+    # products = []
+    # name = request.args.get("name")
+    # if name:
+    #     products = Product.find_by_name(name)
+    # else:
+    #     products = Product.all()
+
+    # results = [product.serialize() for product in products]
+    # app.logger.info("Returning %d pets", len(results))
+    # return jsonify(results), status.HTTP_200_OK
 
 ######################################################################
 # RETRIEVE A Product
