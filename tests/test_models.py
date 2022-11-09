@@ -160,6 +160,24 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(product.description, products[1].description)
         self.assertEqual(product.price, products[1].price)
 
+    def test_find_by_price(self):
+        """Find a Product by Price"""
+        Product(name="K8S", description="Service", price=100).create()
+        Product(name="REST", description="Requirement", price=50).create()
+        products = Product.find_by_price(50)
+        self.assertEqual(products[0].name, "REST")
+        self.assertEqual(products[0].description, "Requirement")
+        self.assertEqual(products[0].price, 50)
+
+    def test_find_by_description(self):
+        """Find a Product by Description"""
+        Product(name="K8S", description="Service", price=100).create()
+        Product(name="REST", description="Requirement", price=50).create()
+        products = Product.find_by_description("Service")
+        self.assertEqual(products[0].name, "K8S")
+        self.assertEqual(products[0].description, "Service")
+        self.assertEqual(products[0].price, 100)
+
     def test_serialize_a_product(self):
         """It should serialize a Product"""
         product = ProductFactory()

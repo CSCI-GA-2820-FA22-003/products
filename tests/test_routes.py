@@ -108,6 +108,48 @@ class TestProductServer(TestCase):
         for product in data:
             self.assertEqual(product["name"], test_name)
 
+    def test_get_product_with_price(self):
+        """Query Products by price"""
+        test_product = ProductFactory()
+        logging.debug(test_product)
+        resp = self.client.post(
+            BASE_URL, json=test_product.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        test_product = resp.get_json()
+
+        resp = self.client.get(
+            BASE_URL,
+            query_string="price={}".format(test_product['price'])
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data[0]["name"], test_product['name'])
+        self.assertEqual(data[0]["description"], test_product['description'])
+        self.assertEqual(data[0]["price"], test_product['price'])
+    
+    def test_get_product_with_description(self):
+        """Query Products by description"""
+        test_product = ProductFactory()
+        logging.debug(test_product)
+        resp = self.client.post(
+            BASE_URL, json=test_product.serialize()
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        test_product = resp.get_json()
+
+        resp = self.client.get(
+            BASE_URL,
+            query_string="description={}".format(test_product['description'])
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data[0]["name"], test_product['name'])
+        self.assertEqual(data[0]["description"], test_product['description'])
+        self.assertEqual(data[0]["price"], test_product['price'])
+
     def test_create_product(self):
         """It should Create a new Product"""
         test_product = ProductFactory()
