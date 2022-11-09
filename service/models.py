@@ -177,7 +177,7 @@ class Product(db.Model):
         :return: a collection of Products with lower or equal price
         :rtype: list
         """
-        logger.info("Processing name query for %s ...", price)
+        logger.info("Processing price query for %s ...", price)
         return cls.query.filter(cls.price <= price)
 
     @classmethod
@@ -188,5 +188,5 @@ class Product(db.Model):
         :return: a collection of Products with that description
         :rtype: list
         """
-        logger.info("Processing name query for %s ...", description)
+        logger.info("Processing description query for %s ...", description)
         return cls.query.filter(cls.description.like(description)).all()
