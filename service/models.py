@@ -150,7 +150,7 @@ class Product(db.Model):
     def find_or_404(cls, product_id: int):
         """Find a Product by it's id
         :param product_id: the id of the Product to find
-        :type prodcut_id: int
+        :type product_id: int
         :return: an instance with the product_id, or 404_NOT_FOUND if not found
         :rtype: Product
         """
@@ -167,3 +167,25 @@ class Product(db.Model):
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
+
+    @classmethod
+    def find_by_price(cls, price: int) -> list:
+        """Returns all Products whose price are lower or equal to the given price
+        :param price: the price of the Products you want to match
+        :type price: int
+        :return: a collection of Products with lower or equal price
+        :rtype: list
+        """
+        logger.info("Processing price query for %s ...", price)
+        return cls.query.filter(cls.price <= price)
+
+    @classmethod
+    def find_by_description(cls, description: str) -> list:
+        """Returns all Products with the given description
+        :param description: the description of the Products you want to match
+        :type description: str
+        :return: a collection of Products with that description
+        :rtype: list
+        """
+        logger.info("Processing description query for %s ...", description)
+        return cls.query.filter(cls.description.like(description)).all()

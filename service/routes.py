@@ -46,15 +46,31 @@ def list_products():
     """"Return all of the Products"""
     app.logger.info("Request for product list")
     products = []
+    flag = False
     name = request.args.get("name")
+    price = request.args.get("price")
+    description = request.args.get("description")
     if name:
+        app.logger.info('Filtering by name: %s', name)
         products = Product.find_by_name(name)
-    else:
+        flag = True
+    if price:
+        app.logger.info('Filtering by price: %s', price)
+        products = Product.find_by_price(price)
+        flag = True
+    if description:
+        app.logger.info('Filtering by description: %s', description)
+        products = Product.find_by_description(description)
+        flag = True
+
+    if not flag:
+        app.logger.info('Returning unfiltered list.')
         products = Product.all()
 
     results = [product.serialize() for product in products]
     app.logger.info("Returning %d pets", len(results))
     return jsonify(results), status.HTTP_200_OK
+
 
 ######################################################################
 # RETRIEVE A Product
