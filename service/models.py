@@ -12,7 +12,6 @@ description: string - the description for the product
 price: integer - the price of the product
 """
 import logging
-import string
 import constant
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
