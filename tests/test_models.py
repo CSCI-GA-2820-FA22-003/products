@@ -50,7 +50,7 @@ class TestProductModel(unittest.TestCase):
         """It should Create a product and assert that it exists"""
         product = Product(id=85265765, name="airPods",
                           description="headphone developed by Apple", price=149)
-        self.assertEqual(str(product), "<Product 'airPods' id=[85265765]>")
+        self.assertEqual(str(product), "<Product airPods id=[85265765]>")
         self.assertTrue(product is not None)
         self.assertEqual(product.id, 85265765)
         self.assertEqual(product.name, "airPods")

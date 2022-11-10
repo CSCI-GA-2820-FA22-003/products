@@ -128,7 +128,7 @@ class TestProductServer(TestCase):
         self.assertEqual(data[0]["name"], test_product['name'])
         self.assertEqual(data[0]["description"], test_product['description'])
         self.assertEqual(data[0]["price"], test_product['price'])
-    
+
     def test_get_product_with_description(self):
         """Query Products by description"""
         test_product = ProductFactory()
@@ -142,7 +142,7 @@ class TestProductServer(TestCase):
 
         resp = self.client.get(
             BASE_URL,
-            query_string="description={}".format(test_product['description'])
+            query_string=f"description={test_product['description']}"
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()

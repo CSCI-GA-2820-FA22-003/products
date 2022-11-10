@@ -43,11 +43,13 @@ class Product(db.Model):
     name = db.Column(
         db.String(constant.LENGTH_MAX_PRODUCT_NAME), nullable=False)
     description = db.Column(
-        db.String(constant.LENGTH_MAX_PRODUCT_DESC), nullable=True)
+        db.String(constant.LENGTH_MAX_PRODUCT_DESC))
     price = db.Column(db.Integer, default=0, nullable=False)
+    like_num = db.Column(db.Integer, default=0)
+    is_on_shelf = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
-        return "<Product %r id=[%s]>" % (self.name, self.id)
+        return f"<Product {self.name} id=[{self.id}]>"
 
     def create(self):
         """
@@ -80,6 +82,8 @@ class Product(db.Model):
             "name": self.name,
             "description": self.description,
             "price": self.price,
+            "like_num": self.like_num,
+            "is_on_shelf": self.is_on_shelf
         }
 
     def deserialize(self, data: dict):
@@ -90,12 +94,12 @@ class Product(db.Model):
         """
         try:
             self.name = data["name"]
-            if (len(self.name) > constant.LENGTH_MAX_PRODUCT_NAME):
+            if len(self.name) > constant.LENGTH_MAX_PRODUCT_NAME:
                 raise DataValidationError(
                     "Invalid Product: Too long name string: "
                 )
             self.description = data.get('description', '')
-            if (len(self.description) > constant.LENGTH_MAX_PRODUCT_DESC):
+            if len(self.description) > constant.LENGTH_MAX_PRODUCT_DESC:
                 raise DataValidationError(
                     "Invalid Product: Too long description string: "
                 )
@@ -106,6 +110,8 @@ class Product(db.Model):
                     "Invalid Product: invalid type for price: "
                     + str(type(data['price'] + " instead of [int/float]"))
                 )
+            self.like_num = data.get('like_num', 0)
+            self.is_on_shelf = data.get('is_on_shelf', True)
         except KeyError as error:
             raise DataValidationError(
                 "Invalid product: missing " + error.args[0]) from error
@@ -127,6 +133,7 @@ class Product(db.Model):
         # This is where we initialize SQLAlchemy from the Flask app
         db.init_app(app)
         app.app_context().push()
+        # db.drop_all()
         db.create_all()  # make our sqlalchemy tables
 
     @classmethod
