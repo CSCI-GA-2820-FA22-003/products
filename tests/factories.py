@@ -31,7 +31,9 @@ class ProductFactory(factory.Factory):
         model = Product
 
     id = factory.Sequence(lambda n: n)
-    name = FuzzyChoice(choices=[
-                       "clothing", "shoes", "jewelry", "watches", "fresh", "books", "movies", "games"])
+    name = FuzzyChoice(choices=["clothing", "shoes",
+                                "jewelry", "watches", "fresh", "books", "movies", "games"])
     price = factory.Faker("random_int")
     description = factory.Faker("sentence")
+    like_num = factory.Faker("random_int")
+    is_on_shelf = factory.Faker('pybool')
