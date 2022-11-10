@@ -156,6 +156,92 @@ def delete_product(product_id):
 
     app.logger.info("Product with ID [%s] delete complete.", product_id)
     return "", status.HTTP_204_NO_CONTENT
+
+
+# ######################################################################
+# # ACTIONS ON PRODUCT
+# ######################################################################
+
+@app.route("/products/<int:product_id>/like", methods=["PUT"])
+def like_product(product_id):
+    """
+    like a Product
+    This endpoint will add the like_num of the product
+    """
+    app.logger.info("Request to like Product with id: %s", product_id)
+
+    product = Product.find(product_id)
+    if not product:
+        abort(status.HTTP_404_NOT_FOUND,
+              f"Product with id '{product_id}' was not found.")
+
+    product.id = product_id
+    product.like_num += 1
+    product.update()
+
+    app.logger.info("Product with ID [%s] add one like.", product.id)
+    return jsonify(product.serialize()), status.HTTP_200_OK
+
+
+@app.route("/products/<int:product_id>/unlike", methods=["PUT"])
+def unlike_product(product_id):
+    """
+    unlike a Product
+    This endpoint will decrease the like_num of the product
+    """
+    app.logger.info("Request to like Product with id: %s", product_id)
+
+    product = Product.find(product_id)
+    if not product:
+        abort(status.HTTP_404_NOT_FOUND,
+              f"Product with id '{product_id}' was not found.")
+
+    product.id = product_id
+    product.like_num -= 1
+    product.update()
+
+    app.logger.info("Product with ID [%s] decrease one like.", product.id)
+    return jsonify(product.serialize()), status.HTTP_200_OK
+
+
+@app.route("/products/<int:product_id>/on-shelf", methods=["PUT"])
+def on_shelf_product(product_id):
+    """
+    mark a Product as on sell
+    """
+    app.logger.info("Request to on shelf Product with id: %s", product_id)
+
+    product = Product.find(product_id)
+    if not product:
+        abort(status.HTTP_404_NOT_FOUND,
+              f"Product with id '{product_id}' was not found.")
+
+    product.is_on_shelf = True
+    product.update()
+
+    app.logger.info("Product with ID [%s] is on shelf.", product.id)
+    return jsonify(product.serialize()), status.HTTP_200_OK
+
+
+@app.route("/products/<int:product_id>/off-shelf", methods=["PUT"])
+def off_shelf_product(product_id):
+    """
+    mark a Product as off sell
+    """
+    app.logger.info("Request to off shelf Product with id: %s", product_id)
+
+    product = Product.find(product_id)
+    if not product:
+        abort(status.HTTP_404_NOT_FOUND,
+              f"Product with id '{product_id}' was not found.")
+
+    product.is_on_shelf = False
+    product.update()
+
+    app.logger.info("Product with ID [%s] is off shelf.", product.id)
+    return jsonify(product.serialize()), status.HTTP_200_OK
+
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################

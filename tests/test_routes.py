@@ -183,11 +183,11 @@ class TestProductServer(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # update the product
-        new_project = response.get_json()
-        logging.debug(new_project)
-        new_project["name"] = "unknown_class"
+        new_product = response.get_json()
+        logging.debug(new_product)
+        new_product["name"] = "unknown_class"
         response = self.client.put(
-            f"{BASE_URL}/{new_project['id']}", json=new_project)
+            f"{BASE_URL}/{new_product['id']}", json=new_product)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_product = response.get_json()
         self.assertEqual(updated_product["name"], "unknown_class")
@@ -213,6 +213,54 @@ class TestProductServer(TestCase):
         # make sure they are deleted
         response = self.client.get(f"{BASE_URL}/{test_product.id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_like_action(self):
+        """It should change the like_num of an existing Product"""
+        # create a product to update
+        test_product = ProductFactory()
+        test_product.like_num = 0
+        response = self.client.post(BASE_URL, json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        product_id = response.get_json()["id"]
+
+        # like the product
+        response = self.client.put(f"{BASE_URL}/{product_id}/like")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.get_json()["like_num"], 1)
+        response = self.client.put(f"{BASE_URL}/{product_id}/like")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.get_json()["like_num"], 2)
+
+        # unlike the product
+        response = self.client.put(f"{BASE_URL}/{product_id}/unlike")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.get_json()["like_num"], 1)
+        response = self.client.put(f"{BASE_URL}/{product_id}/unlike")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.get_json()["like_num"], 0)
+        response = self.client.put(f"{BASE_URL}/{product_id}/unlike")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.get_json()["like_num"], -1)
+
+    def test_on_shelf_action(self):
+        """It should change the is_on_shelf of an existing Product"""
+        # create a product to update
+        test_product = ProductFactory()
+        test_product.is_on_shelf = False
+        response = self.client.post(BASE_URL, json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.get_json()["is_on_shelf"], False)
+        product_id = response.get_json()["id"]
+
+        # on shelf the product
+        response = self.client.put(f"{BASE_URL}/{product_id}/on-shelf")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.get_json()["is_on_shelf"], True)
+
+        # off shelf the product
+        response = self.client.put(f"{BASE_URL}/{product_id}/off-shelf")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.get_json()["is_on_shelf"], False)
 
      ######################################################################
     #  T E S T   S A D   P A T H S
@@ -267,4 +315,30 @@ class TestProductServer(TestCase):
         # update the product
         response = self.client.put(
             f"{BASE_URL}/{test_product.id}", json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_like_action_on_product_non_existing(self):
+        """It should not update an non-existing Product"""
+        # make sure product not exist
+        test_product = ProductFactory()
+        test_product.id = 4567486
+        response = self.client.delete(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        response = self.client.put(f"{BASE_URL}/{test_product.id}/like")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        response = self.client.put(f"{BASE_URL}/{test_product.id}/unlike")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_on_shelf_action_on_product_non_existing(self):
+        """It should not update an non-existing Product"""
+        # make sure product not exist
+        test_product = ProductFactory()
+        test_product.id = 4567486
+        response = self.client.delete(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        response = self.client.put(f"{BASE_URL}/{test_product.id}/on-shelf")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        response = self.client.put(f"{BASE_URL}/{test_product.id}/off-shelf")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
