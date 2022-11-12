@@ -171,11 +171,11 @@ class TestProductModel(unittest.TestCase):
 
     def test_find_by_description(self):
         """Find a Product by Description"""
-        Product(name="K8S", description="Service", price=100).create()
+        Product(name="K8S", description="Good Service", price=100).create()
         Product(name="REST", description="Requirement", price=50).create()
         products = Product.find_by_description("Service")
         self.assertEqual(products[0].name, "K8S")
-        self.assertEqual(products[0].description, "Service")
+        self.assertEqual(products[0].description, "Good Service")
         self.assertEqual(products[0].price, 100)
 
     def test_serialize_a_product(self):

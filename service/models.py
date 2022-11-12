@@ -188,4 +188,4 @@ class Product(db.Model):
         :rtype: list
         """
         logger.info("Processing description query for %s ...", description)
-        return cls.query.filter(cls.description.like(description)).all()
+        return cls.query.filter(cls.description.like(f"%{description}%"))
