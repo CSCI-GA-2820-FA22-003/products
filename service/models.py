@@ -133,7 +133,7 @@ class Product(db.Model):
         # This is where we initialize SQLAlchemy from the Flask app
         db.init_app(app)
         app.app_context().push()
-        # db.drop_all()
+        db.drop_all()
         db.create_all()  # make our sqlalchemy tables
 
     @classmethod
@@ -195,4 +195,4 @@ class Product(db.Model):
         :rtype: list
         """
         logger.info("Processing description query for %s ...", description)
-        return cls.query.filter(cls.description.like(description)).all()
+        return cls.query.filter(cls.description.like(f"%{description}%"))
