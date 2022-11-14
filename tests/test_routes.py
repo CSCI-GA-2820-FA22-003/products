@@ -8,7 +8,7 @@ Test cases can be run with the following:
 import os
 import logging
 from unittest import TestCase
-#from unittest.mock import MagicMock, patch
+# from unittest.mock import MagicMock, patch
 
 from urllib.parse import quote_plus
 from service import app
@@ -262,7 +262,7 @@ class TestProductServer(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.get_json()["is_on_shelf"], False)
 
-     ######################################################################
+    ######################################################################
     #  T E S T   S A D   P A T H S
     ######################################################################
 
