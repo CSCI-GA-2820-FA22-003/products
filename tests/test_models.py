@@ -79,7 +79,7 @@ class TestProductModel(unittest.TestCase):
         self.assertIsNotNone(product.id)
         # Fetch it back
         found_product = Product.find(product.id)
-        self.assertEqual(found_product.id, product.id)
+        self.assertNotEqual(found_product.id, product.id)
         self.assertEqual(found_product.name, product.name)
 
     def test_update_a_product(self):
