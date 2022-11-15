@@ -103,7 +103,7 @@ class TestProductServer(TestCase):
             BASE_URL, query_string=f"name={quote_plus(test_name)}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        self.assertNotEqual(len(data), len(name_products))
+        self.assertEqual(len(data), len(name_products))
         # check the data
         for product in data:
             self.assertEqual(product["name"], test_name)
@@ -118,7 +118,6 @@ class TestProductServer(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
 
         test_product = resp.get_json()
-
         resp = self.client.get(
             BASE_URL,
             query_string="price={}".format(test_product['price'])
