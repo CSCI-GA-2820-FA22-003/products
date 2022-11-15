@@ -76,7 +76,7 @@ class TestProductModel(unittest.TestCase):
         logging.debug(product)
         product.id = None
         product.create()
-        self.assertIsNotNone(product.id)
+        self.assertIsNone(product.id)
         # Fetch it back
         found_product = Product.find(product.id)
         self.assertEqual(found_product.id, product.id)
