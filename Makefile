@@ -52,7 +52,7 @@ run: ## Run the service
 
 .PHONY: deploy
 deploy: ## Deploy the service on local Kubernetes
-	$(info Deploying service locally...)
+	$(info Deploying service to IBM Cloud Kubernetes...)
 	kubectl apply -f deploy/
 
 .PHONY: login

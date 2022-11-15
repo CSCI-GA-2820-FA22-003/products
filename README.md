@@ -21,6 +21,20 @@ To run tests for database models and routes, run the command: `nosetests -v --wi
 
 To launch the service, run the command: `make run`
 
+## Deploy the Microservice to IBM Cloud Kubernetes
+
+Firstly, if you don't have a IBM Cloud Kubernetes Cluster, go to https://cloud.ibm.com/kubernetes/catalog/create to create one.
+
+As a first step, go to https://cloud.ibm.com/iam to create a API KEY so that you can use IBM Cloud CLI to control your resources. Save the `apikey.json` file to `~/.products` (create this folder if you don't have one).
+
+Open Visual Studio Code and enter the Dev Container environment according to the instruction above. If you have opened and built a docker container of an older version, you need to rebuild and reopen the container.
+
+Run `make login` to login to IBM Cloud
+
+Run `make build` to build a docker image that can be used for production deployment. There new image will have two tags: `latest` and the trimmed git commit hash of the current commit. Run `make image-push` to push the image to `nyu-devops-products` IBM Cloud Container Registry. If you are deploying this application to your own account, you need to create a container registry namespace and modify everywhere that use `nyu-devops-products` to your own registry namespace.
+
+Run `make deploy` to deploy the app to Kubernetes. The service will be deployed to two namespaces: `dev` and `prod`. You can modify `deployment.yaml` file to choose the image you want to deploy for each namespace.
+
 ## Contents
 
 The project contains the following:
