@@ -79,7 +79,7 @@ class TestProductServer(TestCase):
 
     def test_health(self):
         """It should be health"""
-        response = self.client.get("/healthcheck")
+        response = self.client.get("/health")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(data["status"], 200)

@@ -1,10 +1,11 @@
-import os
 import logging
+import os
 import unittest
-from service.models import Product, DataValidationError, db
+
 from service import app
+from service.common import constant
+from service.models import DataValidationError, Product, db
 from tests.factories import ProductFactory
-import constant
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
