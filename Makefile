@@ -4,6 +4,7 @@ NAMESPACE ?= nyu-devops-products
 IMAGE_NAME ?= products
 IMAGE_TAG ?= $(shell git log -1 --pretty=%h)
 IMAGE ?= $(REGISTRY)/$(NAMESPACE)/$(IMAGE_NAME):$(IMAGE_TAG)
+IMAGE_LATEST ?= $(REGISTRY)/$(NAMESPACE)/$(IMAGE_NAME):latest
 # PLATFORM ?= "linux/amd64,linux/arm64"
 PLATFORM ?= "linux/amd64"
 CLUSTER ?= nyu-devops
@@ -65,6 +66,7 @@ login: ## Login to IBM Cloud using yur api key
 .PHONY: push
 image-push: ## Push to a Docker image registry
 	$(info Logging into IBM Cloud cluster $(CLUSTER)...)
+	docker push $(IMAGE_LATEST)
 	docker push $(IMAGE)
 
 ############################################################
@@ -81,7 +83,7 @@ init:	## Creates the buildx instance
 .PHONY: build
 build:	## Build all of the project Docker images
 	$(info Building $(IMAGE) for $(PLATFORM)...)
-	docker buildx build --file Dockerfile  --pull --platform=$(PLATFORM) --tag $(IMAGE) --load .
+	docker buildx build --file Dockerfile  --pull --platform=$(PLATFORM) --tag $(IMAGE) --tag $(IMAGE_LATEST) --load .
 
 .PHONY: remove
 remove:	## Stop and remove the buildx builder
