@@ -49,6 +49,11 @@ tests/              - test cases package
 └── test_routes.py  - test suite for service routes
 ```
 
+## Github Action CI
+
+Every Pull Request should guarantee to pass all tests first before it is merged into master.
+
+
 ## Product table schema
 ```
 {
