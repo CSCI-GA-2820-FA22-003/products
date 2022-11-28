@@ -18,7 +18,8 @@ from tests.factories import ProductFactory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb")
-BASE_URL = "/products"
+BASE_URL = "/api/products"
+CONTENT_TYPE_JSON = "application/json"
 
 ######################################################################
 #  T E S T   C A S E S
@@ -58,7 +59,10 @@ class TestProductServer(TestCase):
         for _ in range(count):
             test_product = ProductFactory()
             response = self.client.post(
-                BASE_URL, json=test_product.serialize())
+                BASE_URL, 
+                json=test_product.serialize(),
+                content_type=CONTENT_TYPE_JSON,
+                )
             self.assertEqual(response.status_code, status.HTTP_201_CREATED,
                              "Could not create test product")
             new_product = response.get_json()
@@ -280,7 +284,7 @@ class TestProductServer(TestCase):
         """It should not Create a Product with no content type"""
         response = self.client.post(BASE_URL)
         self.assertEqual(response.status_code,
-                         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+                         status.HTTP_400_BAD_REQUEST)
 
     def test_create_product_bad_price(self):
         """It should not Create a Product with bad price data"""
@@ -293,16 +297,32 @@ class TestProductServer(TestCase):
 
     def test_update_product_no_content_type(self):
         """It should not update a product with no content type"""
-        response = self.client.put(BASE_URL+"/1")
-        self.assertEqual(response.status_code,
-                         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        # create a product to update
+        test_product = ProductFactory()
+        response = self.client.post(BASE_URL, json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # update the product
+        new_product = response.get_json()
+        response = self.client.put(
+            f"{BASE_URL}/{new_product['id']}")
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_product_wrong_content_type(self):
         """It should not update a product with wrong content type"""
+        # create a product to update
+        test_product = ProductFactory()
+        response = self.client.post(BASE_URL, json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # update the product
+        new_product = response.get_json()
         response = self.client.put(
-            BASE_URL+"/1", content_type='<p>hello boy</p>')
+            f"{BASE_URL}/{new_product['id']}", content_type='<p>hello boy</p>')
+        print(response.data)
         self.assertEqual(response.status_code,
-                         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+                         status.HTTP_400_BAD_REQUEST)
 
     def test_update_product_non_existing(self):
         """It should not update an non-existing Product"""

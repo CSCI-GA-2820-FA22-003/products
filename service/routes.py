@@ -11,11 +11,11 @@ from service.common import error_handlers, status    # HTTP Status Codes
 from .common import status  # HTTP Status Codes
 from service.models import Product
 
-from . import app
+from . import app, api
 
 
 ######################################################################
-# GET INDEX
+# Configure the Root route before OpenAPI
 ######################################################################
 @app.route("/")
 def index():
@@ -24,9 +24,42 @@ def index():
     return app.send_static_file('index_temp.html')
 
 
+    # id = db.Column(db.Integer, primary_key=True)
+# Define the model so that the docs reflect what can be sent
+create_model = api.model('Product', {
+    'name': fields.String(required=True,
+                          description='The name of the Product'),
+    'description': fields.String(required=False,
+                                 description='The description of the Product'),
+    'price': fields.Integer(required=True,
+                            description='The price of the Product'),
+    'like_num': fields.Integer(description='Peoples\' votes to this product'),
+    'is_on_shelf': fields.Boolean(description='Is the Product is currently ready to sale?')
+})
+
+product_model = api.inherit(
+    'ProductModel',
+    create_model,
+    {
+        'id': fields.String(readOnly=True,
+                            description='The unique id assigned internally by service'),
+    }
+)
+
+# query string arguments
+product_args = reqparse.RequestParser()
+product_args.add_argument('name', type=str, required=False,
+                          help='Find the Product by name')
+product_args.add_argument('description', type=str, required=False,
+                          help='List Products contains specified description')
+product_args.add_argument('price', type=int, required=False,
+                          help='List Products which has a price less than or equal to input')
+
 ######################################################################
 # GET HEALTH CHECK
 ######################################################################
+
+
 @app.route("/health")
 def healthcheck():
     """Let them know our heart is still beating"""
@@ -36,18 +69,18 @@ def healthcheck():
 ######################################################################
 # Authorization Decorator
 ######################################################################
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token = None
-        if 'X-Api-Key' in request.headers:
-            token = request.headers['X-Api-Key']
+# def token_required(f):
+#     @wraps(f)
+#     def decorated(*args, **kwargs):
+#         token = None
+#         if 'X-Api-Key' in request.headers:
+#             token = request.headers['X-Api-Key']
 
-        if app.config.get('API_KEY') and app.config['API_KEY'] == token:
-            return f(*args, **kwargs)
-        else:
-            return {'message': 'Invalid or missing token'}, 401
-    return decorated
+#         if app.config.get('API_KEY') and app.config['API_KEY'] == token:
+#             return f(*args, **kwargs)
+#         else:
+#             return {'message': 'Invalid or missing token'}, 401
+#     return decorated
 
 
 ######################################################################
@@ -59,129 +92,147 @@ def generate_apikey():
 
 
 ######################################################################
-# LIST ALL PRODUCTS
+#  PATH: /products/{id}
+######################################################################
+@api.route('/products/<product_id>')
+@api.param('product_id', 'The Pet identifier')
+class ProductResource(Resource):
+    """
+    ProductResource class
+
+    Allows the manipulation of a single product
+    GET /products/{id} - Returns a product with the id
+    PUT /products/{id} - Update a product with the id
+    DELETE /products/{id} -  Deletes a product with the id
+    """
+    # ------------------------------------------------------------------
+    # RETRIEVE A PRODUCT
+    # ------------------------------------------------------------------
+    @api.doc('get_product')
+    @api.response(404, 'product not found')
+    @api.marshal_with(product_model)
+    def get(self, product_id):
+        """
+        Retrieve a single Product
+
+        This endpoint will return a Product based on it's id
+        """
+        app.logger.info(
+            "Request to Retrieve a product with id [%s]", product_id)
+        product = Product.find(product_id)
+        if not product:
+            abort(status.HTTP_404_NOT_FOUND,
+                  "Product with id '{}' was not found.".format(product_id))
+        return product.serialize(), status.HTTP_200_OK
+
+    # ------------------------------------------------------------------
+    # UPDATE AN EXISTING PRODUCT
+    # ------------------------------------------------------------------
+    @api.doc('update_product')
+    @api.response(404, 'Product not found')
+    @api.response(400, 'The posted Product data was not valid')
+    @api.expect(product_model)
+    @api.marshal_with(product_model)
+    def put(self, product_id):
+        """
+        Update a Product
+
+        This endpoint will update a Product based the body that is posted
+        """
+        app.logger.info('Request to Update a product with id [%s]', product_id)
+        product = Product.find(product_id)
+        if not product:
+            abort(status.HTTP_404_NOT_FOUND,
+                  "Pet with id '{}' was not found.".format(product_id))
+        app.logger.debug('Payload = %s', api.payload)
+        data = api.payload
+        product.deserialize(data)
+        product.id = product_id
+        product.update()
+        return product.serialize(), status.HTTP_200_OK
+
+    # ------------------------------------------------------------------
+    # DELETE A PRODUCT
+    # ------------------------------------------------------------------
+    @api.doc('delete_product')
+    @api.response(204, 'Product deleted')
+    def delete(self, product_id):
+        """
+        Delete a Product
+
+        This endpoint will delete a Product based the id specified in the path
+        """
+        app.logger.info('Request to Delete a product with id [%s]', product_id)
+        product = Product.find(product_id)
+        if product:
+            product.delete()
+            app.logger.info('Product with id [%s] was deleted', product_id)
+
+        return '', status.HTTP_204_NO_CONTENT
+
+######################################################################
+#  PATH: /products
 ######################################################################
 
-@app.route("/products", methods=["GET"])
-def list_products():
-    """"Return all of the Products"""
-    app.logger.info("Request for product list")
-    products = []
-    flag = False
-    name = request.args.get("name")
-    price = request.args.get("price")
-    description = request.args.get("description")
-    if name:
-        app.logger.info('Filtering by name: %s', name)
-        products = Product.find_by_name(name)
-        flag = True
-    if price:
-        app.logger.info('Filtering by price: %s', price)
-        products = Product.find_by_price(price)
-        flag = True
-    if description:
-        app.logger.info('Filtering by description: %s', description)
-        products = Product.find_by_description(description)
-        flag = True
 
-    if not flag:
-        app.logger.info('Returning unfiltered list.')
-        products = Product.all()
+@api.route('/products', strict_slashes=False)
+class ProductCollection(Resource):
+    """ Handles all interactions with collections of Products """
+    # ------------------------------------------------------------------
+    # LIST ALL PRODUCTS
+    # ------------------------------------------------------------------
+    @api.doc('list_products')
+    @api.expect(product_args, validate=True)
+    @api.marshal_list_with(product_model)
+    def get(self):
+        """"Return all of the Products"""
+        app.logger.info("Request for product list")
+        products = []
+        args = product_args.parse_args()
+        if args['name']:
+            app.logger.info('Filtering by name: %s', args['name'])
+            products = Product.find_by_name(args['name'])
+        elif args['price']:
+            app.logger.info('Filtering by price: %s', args['price'])
+            products = Product.find_by_price(args['price'])
+        elif args['description']:
+            app.logger.info('Filtering by description: %s',
+                            args['description'])
+            products = Product.find_by_description(args['description'])
+        else:
+            app.logger.info('Returning unfiltered list.')
+            products = Product.all()
 
-    results = [product.serialize() for product in products]
-    app.logger.info("Returning %d products", len(results))
-    return jsonify(results), status.HTTP_200_OK
+        app.logger.info("Returning %d products", len(products))
+        results = [product.serialize() for product in products]
+        return results, status.HTTP_200_OK
 
-
-######################################################################
-# RETRIEVE A Product
-######################################################################
-
-
-@app.route("/products/<int:product_id>", methods=["GET"])
-def get_products(product_id):
-    """
-    Retrieve a single Product
-    This endpoint will return a Product based on it's id
-    """
-    app.logger.info("Request for product with id: %s", product_id)
-    product = Product.find(product_id)
-    if not product:
-        abort(status.HTTP_404_NOT_FOUND,
-              f"Product with id '{product_id}' was not found.")
-
-    app.logger.info("Returning product: %s", product.name)
-    return jsonify(product.serialize()), status.HTTP_200_OK
-
-######################################################################
-# ADD A NEW Product
-######################################################################
-
-
-@app.route("/products", methods=["POST"])
-def create_products():
-    """
-    Creates a Product
-    This endpoint will create a Product based the data in the body that is posted
-    """
-    app.logger.info("Request to create a product")
-    check_content_type("application/json")
-    product = Product()
-    product.deserialize(request.get_json())
-    product.create()
-    message = product.serialize()
-    location_url = url_for(
-        "get_products", product_id=product.id, _external=True)
-
-    app.logger.info("Product with ID [%s] created.", product.id)
-    return jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
-
-# ######################################################################
-# # UPDATE AN EXISTING Product
-# ######################################################################
-
-
-@app.route("/products/<int:product_id>", methods=["PUT"])
-def update_product(product_id):
-    """
-    Update a Product
-
-    This endpoint will update a Product based the body that is posted
-    """
-    app.logger.info("Request to update Product with id: %s", product_id)
-    check_content_type("application/json")
-
-    product = Product.find(product_id)
-    if not product:
-        abort(status.HTTP_404_NOT_FOUND,
-              f"Product with id '{product_id}' was not found.")
-
-    product.deserialize(request.get_json())
-    product.id = product_id
-    product.update()
-
-    app.logger.info("Product with ID [%s] updated.", product.id)
-    return jsonify(product.serialize()), status.HTTP_200_OK
-
-
-@app.route("/products/<int:product_id>", methods=["DELETE"])
-def delete_product(product_id):
-    """
-    Delete a Product
-    This endpoint will delete a Product based the body that is posted
-    """
-    app.logger.info("Request to delete Product with id: %s", product_id)
-    product = Product.find(product_id)
-    if product:
-        product.delete()
-
-    app.logger.info("Product with ID [%s] delete complete.", product_id)
-    return "", status.HTTP_204_NO_CONTENT
-
+    # ------------------------------------------------------------------
+    # ADD A NEW PRODUCT
+    # ------------------------------------------------------------------
+    @api.doc('create_a_product')
+    @api.response(400, 'The posted data was not valid')
+    @api.expect(create_model)
+    @api.marshal_with(product_model, code=201)
+    def post(self):
+        """
+        Creates a Product
+        This endpoint will create a Product based the data in the body that is posted
+        """
+        app.logger.info("Request to create a product")
+        product = Product()
+        app.logger.debug('Payload = %s', api.payload)
+        product.deserialize(api.payload)
+        product.create()
+        app.logger.info("Product with ID [%s] created.", product.id)
+        location_url = api.url_for(
+            ProductResource, product_id=product.id, _external=True)
+        return product.serialize(), status.HTTP_201_CREATED, {"Location": location_url}
 
 # ######################################################################
 # # ACTIONS ON PRODUCT
 # ######################################################################
+
 
 @app.route("/products/<int:product_id>/like", methods=["PUT"])
 def like_product(product_id):
@@ -271,7 +322,7 @@ def off_shelf_product(product_id):
 #     """Logs errors before aborting"""
 #     app.logger.error(message)
 #     api.abort(error_code, message)
-    
+
 def init_db():
     """ Initializes the SQLAlchemy app """
     global app
