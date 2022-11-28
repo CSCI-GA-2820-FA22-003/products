@@ -3,12 +3,14 @@ My Service
 
 Describe what your service does here
 """
-
+import secrets
 from flask import jsonify, request, url_for, abort
+from flask_restx import Api, Resource, fields, reqparse, inputs
+from service.models import DataValidationError, DatabaseConnectionError
+from service.common import error_handlers, status    # HTTP Status Codes
 from .common import status  # HTTP Status Codes
 from service.models import Product
 
-# Import Flask application
 from . import app
 
 
@@ -19,13 +21,7 @@ from . import app
 def index():
     """ Root URL response """
     app.logger.info("Request for Root URL")
-    return (
-        jsonify(name="Product REST API Service",
-                version="1.0",
-                # paths=url_for("list_products", _external=True)
-                ),
-        status.HTTP_200_OK,
-    )
+    return app.send_static_file('index_temp.html')
 
 
 ######################################################################
@@ -35,6 +31,31 @@ def index():
 def healthcheck():
     """Let them know our heart is still beating"""
     return jsonify(status=200, message="Healthy"), status.HTTP_200_OK
+
+
+######################################################################
+# Authorization Decorator
+######################################################################
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'X-Api-Key' in request.headers:
+            token = request.headers['X-Api-Key']
+
+        if app.config.get('API_KEY') and app.config['API_KEY'] == token:
+            return f(*args, **kwargs)
+        else:
+            return {'message': 'Invalid or missing token'}, 401
+    return decorated
+
+
+######################################################################
+# Function to generate a random API key (good for testing)
+######################################################################
+def generate_apikey():
+    """ Helper function used when testing API keys """
+    return secrets.token_hex(16)
 
 
 ######################################################################
@@ -246,7 +267,11 @@ def off_shelf_product(product_id):
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 
-
+# def abort(error_code: int, message: str):
+#     """Logs errors before aborting"""
+#     app.logger.error(message)
+#     api.abort(error_code, message)
+    
 def init_db():
     """ Initializes the SQLAlchemy app """
     global app

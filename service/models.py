@@ -27,8 +27,12 @@ def init_db(app):
     Product.init_db(app)
 
 
+class DatabaseConnectionError(Exception):
+    """Custom Exception when database connection fails"""
+
+
 class DataValidationError(Exception):
-    """ Used for an data validation errors when deserializing """
+    """Custom Exception with data validation fails"""
 
 
 class Product(db.Model):

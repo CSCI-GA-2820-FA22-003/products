@@ -74,8 +74,8 @@ class TestProductServer(TestCase):
         """ It should call the home page """
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.get_json()
-        self.assertEqual(data["name"], "Product REST API Service")
+        # data = resp.get_json()
+        # self.assertEqual(data["name"], "Product REST API Service")
 
     def test_health(self):
         """It should be health"""
