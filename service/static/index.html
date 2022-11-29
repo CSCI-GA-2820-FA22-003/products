@@ -59,29 +59,9 @@
             <div class="form-group">
               <label class="control-label col-sm-2" for="product_description">Description:</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="product_description" placeholder="Enter description for Promotion">
+                <input type="text" class="form-control" id="product_description" placeholder="Enter description for Product">
               </div>
             </div>
-
-            <!-- LIKE NUMBER -->
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="product_like_num">Value:</label>
-              <div class="col-sm-10">
-                <input type="number" class="form-control" id="product_like_num" placeholder="Enter product_like_num for Product">
-              </div>
-            </div>
-
-            <!-- IS ON SHELF -->
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="product_is_on_shelf">Active:</label>
-              <div class="col-sm-10">
-                <select class="form-control" id="product_is_on_shelf">
-                  <option value="true" selected>True</option>
-                  <option value="false">False</option>
-                </select>
-              </div>
-            </div>
-
 
 
             <!-- SUBMIT BUTTONS -->
@@ -91,6 +71,10 @@
                 <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
                 <button type="submit" class="btn btn-success" id="create-btn">Create</button>
                 <button type="submit" class="btn btn-warning" id="update-btn">Update</button>
+                <button type="submit" class="btn btn-warning" id="like-btn">Like</button>
+                <button type="submit" class="btn btn-warning" id="dislike-btn">Dislike</button>
+                <button type="submit" class="btn btn-warning" id="shelf-btn">IsOnShelf</button>
+                
               </div>
             </div>
           </div> <!-- form horizontal -->
@@ -115,7 +99,7 @@
 
       <footer>
         <br><br>
-        <p>&copy; NYU DevOps Promotions</p>
+        <p>&copy; NYU DevOps Products</p>
       </footer>
 
     </div> <!-- container -->
