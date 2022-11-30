@@ -278,7 +278,7 @@ NULL
 * **Error Response:**
 NULL
 
-## Just Test Github Webhook
+## Just Test Github Webhook Trigger
 
 ## License
 
