@@ -34,7 +34,7 @@ $(function () {
         $("#flash_message").append(message);
     }
 
-    const URL = '/products'
+    const URL = '/api/products'
 
     // ****************************************
     // Create a Product
