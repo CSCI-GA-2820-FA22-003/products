@@ -95,7 +95,7 @@ def generate_apikey():
 #  PATH: /products/{id}
 ######################################################################
 @api.route('/products/<product_id>')
-@api.param('product_id', 'The Pet identifier')
+@api.param('product_id', 'The Product identifier')
 class ProductResource(Resource):
     """
     ProductResource class
@@ -143,7 +143,7 @@ class ProductResource(Resource):
         product = Product.find(product_id)
         if not product:
             abort(status.HTTP_404_NOT_FOUND,
-                  "Pet with id '{}' was not found.".format(product_id))
+                  "Product with id '{}' was not found.".format(product_id))
         app.logger.debug('Payload = %s', api.payload)
         data = api.payload
         product.deserialize(data)
@@ -232,87 +232,94 @@ class ProductCollection(Resource):
 # ######################################################################
 # # ACTIONS ON PRODUCT
 # ######################################################################
+@api.route('/products/<product_id>/like')
+@api.param('product_id', 'The Product identifier')
+class LikeProduct(Resource):
+    """ Like action on a Product """
+    @api.doc('like_products')
+    @api.response(404, 'Product not found')
+    def put(self, product_id):
+        """
+        Like a Product
+        This endpoint will like a Product
+        """
+        app.logger.info('Request to like a Product')
+        product = Product.find(product_id)
+        if not product:
+            abort(status.HTTP_404_NOT_FOUND, 'Product with id [{}] was not found.'.format(product_id))
+
+        product.id = product_id
+        product.like_num += 1
+        product.update()
+
+        app.logger.info('Product with id [%s] has been liked!', product.id)
+        return product.serialize(), status.HTTP_200_OK
 
 
-@app.route("/products/<int:product_id>/like", methods=["PUT"])
-def like_product(product_id):
-    """
-    like a Product
-    This endpoint will add the like_num of the product
-    """
-    app.logger.info("Request to like Product with id: %s", product_id)
+@api.route('/products/<product_id>/unlike')
+@api.param('product_id', 'The Product identifier')
+class UnlikeProduct(Resource):
+    """ Unlike action on a Product """
+    @api.doc('unlike_products')
+    @api.response(404, 'Product not found')
 
-    product = Product.find(product_id)
-    if not product:
-        abort(status.HTTP_404_NOT_FOUND,
-              f"Product with id '{product_id}' was not found.")
+    def put(self, product_id):
+        """
+        Unlike a Product
+        This endpoint will decrease the like_num of the product
+        """
+        app.logger.info('Request to unlike a Product')
+        product = Product.find(product_id)
+        if not product:
+            abort(status.HTTP_404_NOT_FOUND, 'Product with id [{}] was not found.'.format(product_id))
 
-    product.id = product_id
-    product.like_num += 1
-    product.update()
+        product.id = product_id
+        product.like_num -= 1
+        product.update()
 
-    app.logger.info("Product with ID [%s] add one like.", product.id)
-    return jsonify(product.serialize()), status.HTTP_200_OK
-
-
-@app.route("/products/<int:product_id>/unlike", methods=["PUT"])
-def unlike_product(product_id):
-    """
-    unlike a Product
-    This endpoint will decrease the like_num of the product
-    """
-    app.logger.info("Request to like Product with id: %s", product_id)
-
-    product = Product.find(product_id)
-    if not product:
-        abort(status.HTTP_404_NOT_FOUND,
-              f"Product with id '{product_id}' was not found.")
-
-    product.id = product_id
-    product.like_num -= 1
-    product.update()
-
-    app.logger.info("Product with ID [%s] decrease one like.", product.id)
-    return jsonify(product.serialize()), status.HTTP_200_OK
+        app.logger.info('Product with id [%s] decrease one like', product.id)
+        return product.serialize(), status.HTTP_200_OK
 
 
-@app.route("/products/<int:product_id>/on-shelf", methods=["PUT"])
-def on_shelf_product(product_id):
+@api.route('/products/<product_id>/on-shelf')
+@api.param('product_id', 'The Product identifier')
+class OnshelfProduct(Resource):
     """
     mark a Product as on sell
     """
-    app.logger.info("Request to on shelf Product with id: %s", product_id)
+    @api.doc('onshelf_products')
+    @api.response(404, 'Product not found')
+    def put(self, product_id):
+        app.logger.info('Request to onshelf a Product')
+        product = Product.find(product_id)
+        if not product:
+            abort(status.HTTP_404_NOT_FOUND, 'Product with id [{}] was not found.'.format(product_id))
 
-    product = Product.find(product_id)
-    if not product:
-        abort(status.HTTP_404_NOT_FOUND,
-              f"Product with id '{product_id}' was not found.")
+        product.is_on_shelf = True
+        product.update()
 
-    product.is_on_shelf = True
-    product.update()
+        app.logger.info('Product with id [%s] is now onshelf', product.id)
+        return product.serialize(), status.HTTP_200_OK
 
-    app.logger.info("Product with ID [%s] is on shelf.", product.id)
-    return jsonify(product.serialize()), status.HTTP_200_OK
-
-
-@app.route("/products/<int:product_id>/off-shelf", methods=["PUT"])
-def off_shelf_product(product_id):
+@api.route('/products/<product_id>/off-shelf')
+@api.param('product_id', 'The Product identifier')
+class OffshelfProduct(Resource):
     """
     mark a Product as off sell
     """
-    app.logger.info("Request to off shelf Product with id: %s", product_id)
+    @api.doc('offshelf_products')
+    @api.response(404, 'Product not found')
+    def put(self, product_id):
+        app.logger.info('Request to offshelf a Product')
+        product = Product.find(product_id)
+        if not product:
+            abort(status.HTTP_404_NOT_FOUND, 'Product with id [{}] was not found.'.format(product_id))
 
-    product = Product.find(product_id)
-    if not product:
-        abort(status.HTTP_404_NOT_FOUND,
-              f"Product with id '{product_id}' was not found.")
+        product.is_on_shelf = False
+        product.update()
 
-    product.is_on_shelf = False
-    product.update()
-
-    app.logger.info("Product with ID [%s] is off shelf.", product.id)
-    return jsonify(product.serialize()), status.HTTP_200_OK
-
+        app.logger.info('Product with id [%s] is now offshelf', product.id)
+        return product.serialize(), status.HTTP_200_OK
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
