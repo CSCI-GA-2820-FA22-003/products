@@ -35,10 +35,10 @@ app.config['LOGGING_LEVEL'] = logging.INFO
 ######################################################################
 api = Api(app,
           version='1.0.0',
-          title='Order Demo REST API Service',
-          description='This is a sample server Order server.',
-          default='orders',
-          default_label='Orders operations',
+          title='Products Demo REST API Service',
+          description='This is a sample server Product server.',
+          default='products',
+          default_label='Products operations',
           doc='/apidocs',  # default also could use doc='/apidocs/'
         #   authorizations=authorizations,
           prefix='/api'
