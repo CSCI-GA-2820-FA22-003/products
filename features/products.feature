@@ -63,6 +63,16 @@ Scenario: Search by price
     And I should see "bed sheet" in the results
     And I should not see "iphone" in the results
 
+Scenario: Search by description
+    When I visit the "home page"
+    And I set the "description" to "electronics"
+    And I press the "search" button
+    Then I should see the message "Success"
+    And I should see "iphone" in the results
+    And I should not see "book" in the results
+    And I should not see "bed sheet" in the results
+    And I should not see "soap" in the results
+
 
 Scenario: Update a Product
     When I visit the "home page"
