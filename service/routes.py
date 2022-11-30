@@ -21,7 +21,7 @@ from . import app, api
 def index():
     """ Root URL response """
     app.logger.info("Request for Root URL")
-    return app.send_static_file('index_temp.html')
+    return app.send_static_file('index.html')
 
 
     # id = db.Column(db.Integer, primary_key=True)
