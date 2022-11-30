@@ -48,11 +48,11 @@ product_model = api.inherit(
 
 # query string arguments
 product_args = reqparse.RequestParser()
-product_args.add_argument('name', type=str, required=False,
+product_args.add_argument('name', type=str, required=False, location='args',
                           help='Find the Product by name')
-product_args.add_argument('description', type=str, required=False,
+product_args.add_argument('description', type=str, required=False, location='args',
                           help='List Products contains specified description')
-product_args.add_argument('price', type=int, required=False,
+product_args.add_argument('price', type=int, required=False, location='args',
                           help='List Products which has a price less than or equal to input')
 
 ######################################################################
@@ -131,7 +131,7 @@ class ProductResource(Resource):
     @api.doc('update_product')
     @api.response(404, 'Product not found')
     @api.response(400, 'The posted Product data was not valid')
-    @api.expect(product_model)
+    @api.expect(create_model)
     @api.marshal_with(product_model)
     def put(self, product_id):
         """
@@ -189,28 +189,22 @@ class ProductCollection(Resource):
         app.logger.info("Request for product list")
         products = []
         args = product_args.parse_args()
-
-        flag = False
         if args['name']:
             app.logger.info('Filtering by name: %s', args['name'])
             products = Product.find_by_name(args['name'])
-            flag = True
-        if args['price']:
+        elif args['price']:
             app.logger.info('Filtering by price: %s', args['price'])
             products = Product.find_by_price(args['price'])
-            flag = True
-        if args['description']:
+        elif args['description']:
             app.logger.info('Filtering by description: %s',
                             args['description'])
             products = Product.find_by_description(args['description'])
-            flag = True
-        
-        if not flag:
+        else:
             app.logger.info('Returning unfiltered list.')
             products = Product.all()
-
-        app.logger.info("Returning %d products", len(products))
+       
         results = [product.serialize() for product in products]
+        app.logger.info("Returning %d products", len(results))
         return results, status.HTTP_200_OK
 
     # ------------------------------------------------------------------
@@ -247,7 +241,7 @@ class LikeProduct(Resource):
     def put(self, product_id):
         """
         Like a Product
-        This endpoint will like a Product
+        This endpoint will increase the like_num of the Product
         """
         app.logger.info('Request to like a Product')
         product = Product.find(product_id)
@@ -272,7 +266,7 @@ class UnlikeProduct(Resource):
     def put(self, product_id):
         """
         Unlike a Product
-        This endpoint will decrease the like_num of the product
+        This endpoint will decrease the like_num of the Product
         """
         app.logger.info('Request to unlike a Product')
         product = Product.find(product_id)
@@ -298,7 +292,7 @@ class OnshelfProduct(Resource):
     def put(self, product_id):
         """
         Onshelf a Product
-        This endpoint will onshelf the product
+        This endpoint will onshelf the Product
         """
         app.logger.info('Request to onshelf a Product')
         product = Product.find(product_id)
@@ -322,7 +316,7 @@ class OffshelfProduct(Resource):
     def put(self, product_id):
         """
         Offshelf a Product
-        This endpoint will offshelf the product
+        This endpoint will offshelf the Product
         """
         app.logger.info('Request to offshelf a Product')
         product = Product.find(product_id)
@@ -348,23 +342,3 @@ def init_db():
     """ Initializes the SQLAlchemy app """
     global app
     Product.init_db(app)
-
-
-def check_content_type(content_type):
-    """Checks that the media type is correct"""
-    if "Content-Type" not in request.headers:
-        app.logger.error("No Content-Type specified.")
-        abort(
-            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-            f"Content-Type must be {content_type}",
-        )
-
-    if request.headers["Content-Type"] == content_type:
-        return
-
-    app.logger.error("Invalid Content-Type: %s",
-                     request.headers["Content-Type"])
-    abort(
-        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
-        f"Content-Type must be {content_type}",
-    )
