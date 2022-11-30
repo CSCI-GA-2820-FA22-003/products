@@ -189,17 +189,23 @@ class ProductCollection(Resource):
         app.logger.info("Request for product list")
         products = []
         args = product_args.parse_args()
+
+        flag = False
         if args['name']:
             app.logger.info('Filtering by name: %s', args['name'])
             products = Product.find_by_name(args['name'])
-        elif args['price']:
+            flag = True
+        if args['price']:
             app.logger.info('Filtering by price: %s', args['price'])
             products = Product.find_by_price(args['price'])
-        elif args['description']:
+            flag = True
+        if args['description']:
             app.logger.info('Filtering by description: %s',
                             args['description'])
             products = Product.find_by_description(args['description'])
-        else:
+            flag = True
+        
+        if not flag:
             app.logger.info('Returning unfiltered list.')
             products = Product.all()
 
