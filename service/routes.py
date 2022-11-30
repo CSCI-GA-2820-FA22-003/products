@@ -290,6 +290,10 @@ class OnshelfProduct(Resource):
     @api.doc('onshelf_products')
     @api.response(404, 'Product not found')
     def put(self, product_id):
+        """
+        Onshelf a Product
+        This endpoint will onshelf the product
+        """
         app.logger.info('Request to onshelf a Product')
         product = Product.find(product_id)
         if not product:
@@ -310,6 +314,10 @@ class OffshelfProduct(Resource):
     @api.doc('offshelf_products')
     @api.response(404, 'Product not found')
     def put(self, product_id):
+        """
+        Offshelf a Product
+        This endpoint will offshelf the product
+        """
         app.logger.info('Request to offshelf a Product')
         product = Product.find(product_id)
         if not product:
