@@ -86,9 +86,9 @@ def healthcheck():
 ######################################################################
 # Function to generate a random API key (good for testing)
 ######################################################################
-def generate_apikey():
-    """ Helper function used when testing API keys """
-    return secrets.token_hex(16)
+# def generate_apikey():
+#     """ Helper function used when testing API keys """
+#     return secrets.token_hex(16)
 
 
 ######################################################################
