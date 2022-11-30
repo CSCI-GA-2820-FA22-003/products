@@ -205,7 +205,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "PUT",
-            url: `${URL}/${productId}/dislike`,
+            url: `${URL}/${productId}/unlike`,
             contentType: "application/json",
             data: '',
         })

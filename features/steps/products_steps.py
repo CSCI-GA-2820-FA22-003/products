@@ -17,13 +17,10 @@ def step_impl(context):
     # load the database with new products
     for row in context.table:
         payload = {
-            "name": row['Name'],
-            "price": row['Price'],
-            "description": row['Description'],
-            "like_num": row['Like Count'],
-            "is_on_shelf": row['available'] in ['True', 'true', '1'],
-            
-            "is_on_shelf": row['On Shelf']
+            "name": row['name'],
+            "price": int(row['price']),
+            "description": row['description'],
         }
+        print(payload)
         context.resp = requests.post(rest_endpoint, json=payload)
         expect(context.resp.status_code).to_equal(201)
