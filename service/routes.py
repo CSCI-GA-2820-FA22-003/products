@@ -202,7 +202,7 @@ class ProductCollection(Resource):
         else:
             app.logger.info('Returning unfiltered list.')
             products = Product.all()
-       
+
         results = [product.serialize() for product in products]
         app.logger.info("Returning %d products", len(results))
         return results, status.HTTP_200_OK
@@ -232,6 +232,8 @@ class ProductCollection(Resource):
 # ######################################################################
 # # ACTIONS ON PRODUCT
 # ######################################################################
+
+
 @api.route('/products/<product_id>/like')
 @api.param('product_id', 'The Product identifier')
 class LikeProduct(Resource):
@@ -246,7 +248,8 @@ class LikeProduct(Resource):
         app.logger.info('Request to like a Product')
         product = Product.find(product_id)
         if not product:
-            abort(status.HTTP_404_NOT_FOUND, 'Product with id [{}] was not found.'.format(product_id))
+            abort(status.HTTP_404_NOT_FOUND,
+                  'Product with id [{}] was not found.'.format(product_id))
 
         product.id = product_id
         product.like_num += 1
@@ -262,7 +265,6 @@ class UnlikeProduct(Resource):
     """ Unlike action on a Product """
     @api.doc('unlike_products')
     @api.response(404, 'Product not found')
-
     def put(self, product_id):
         """
         Unlike a Product
@@ -271,7 +273,8 @@ class UnlikeProduct(Resource):
         app.logger.info('Request to unlike a Product')
         product = Product.find(product_id)
         if not product:
-            abort(status.HTTP_404_NOT_FOUND, 'Product with id [{}] was not found.'.format(product_id))
+            abort(status.HTTP_404_NOT_FOUND,
+                  'Product with id [{}] was not found.'.format(product_id))
 
         product.id = product_id
         product.like_num -= 1
@@ -297,13 +300,15 @@ class OnshelfProduct(Resource):
         app.logger.info('Request to onshelf a Product')
         product = Product.find(product_id)
         if not product:
-            abort(status.HTTP_404_NOT_FOUND, 'Product with id [{}] was not found.'.format(product_id))
+            abort(status.HTTP_404_NOT_FOUND,
+                  'Product with id [{}] was not found.'.format(product_id))
 
         product.is_on_shelf = True
         product.update()
 
         app.logger.info('Product with id [%s] is now onshelf', product.id)
         return product.serialize(), status.HTTP_200_OK
+
 
 @api.route('/products/<product_id>/off-shelf')
 @api.param('product_id', 'The Product identifier')
@@ -321,7 +326,8 @@ class OffshelfProduct(Resource):
         app.logger.info('Request to offshelf a Product')
         product = Product.find(product_id)
         if not product:
-            abort(status.HTTP_404_NOT_FOUND, 'Product with id [{}] was not found.'.format(product_id))
+            abort(status.HTTP_404_NOT_FOUND,
+                  'Product with id [{}] was not found.'.format(product_id))
 
         product.is_on_shelf = False
         product.update()
@@ -337,6 +343,7 @@ class OffshelfProduct(Resource):
 #     """Logs errors before aborting"""
 #     app.logger.error(message)
 #     api.abort(error_code, message)
+
 
 def init_db():
     """ Initializes the SQLAlchemy app """
