@@ -278,9 +278,6 @@ NULL
 * **Error Response:**
 NULL
 
-## Just Test Github Webhook Trigger
-## Trigger ToolChain
-
 ## License
 
 Copyright (c) John Rofrano. All rights reserved.
