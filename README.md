@@ -1,6 +1,7 @@
 # NYU DevOps Fall 22 Project Products Team
 
-[![Passing](https://img.shields.io/badge/TDD%20tests-Passing-green.svg)](https://github.com/CSCI-GA-2820-FA22-003/products/actions)
+[![Passing](https://img.shields.io/badge/CI%20Build-Passing-green.svg)](https://github.com/CSCI-GA-2820-FA22-003/products/actions)
+[![Passing](https://img.shields.io/badge/BDD%20Tests-Passing-green.svg)](https://github.com/CSCI-GA-2820-FA22-003/products/actions)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 
