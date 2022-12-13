@@ -185,7 +185,9 @@ class ProductCollection(Resource):
     @api.expect(product_args, validate=True)
     @api.marshal_list_with(product_model)
     def get(self):
-        """"Return all of the Products"""
+        """
+        Return all of the Products
+        """
         app.logger.info("Request for product list")
         products = []
         args = product_args.parse_args()
