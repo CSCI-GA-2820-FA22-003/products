@@ -50,10 +50,13 @@ run: ## Run the service
 	$(info Starting service...)
 	honcho start
 
-.PHONY: deploy
-deploy: ## Deploy the service on local Kubernetes
-	$(info Deploying service to IBM Cloud Kubernetes...)
-	kubectl apply -f deploy/
+# .PHONY: deploy
+# deploy: ## Deploy the service on local Kubernetes
+# 	$(info Deploying service to IBM Cloud Kubernetes...)
+# 	kubectl config set-context --current --namespace dev
+# 	kubectl apply -f deploy/
+# 	kubectl config set-context --current --namespace prod
+# 	kubectl apply -f deploy/	
 
 .PHONY: login
 login: ## Login to IBM Cloud using yur api key
